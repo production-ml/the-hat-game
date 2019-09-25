@@ -2,4 +2,4 @@ Flask
 numpy
 pandas
 fasttext
-sklearn
+scikit-learn

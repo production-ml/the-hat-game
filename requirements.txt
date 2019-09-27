@@ -3,3 +3,4 @@ pandas
 scikit-learn
 fasttext
 IPython
+nltk

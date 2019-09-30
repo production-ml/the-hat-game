@@ -1,0 +1,1 @@
+The code in this folder is build upon a docker image example taken from an excellent comprehensive guide about Docker https://docker-curriculum.com

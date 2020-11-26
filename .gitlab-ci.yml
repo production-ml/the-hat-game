@@ -18,17 +18,15 @@ cache:
     - .cache/pip
     - venv/
 
-before_script:
-  - python -V               # Print out python version for debugging
-  - pip install virtualenv
-  - virtualenv venv
-  - source venv/bin/activate
-
 test:
   stage: test
   image: python:3-buster
   script:
     - echo "Running tests"
+    - python -V               # Print out python version for debugging
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
     - cd docker-flask-app
     - pip install -r requirements.txt
     - py.test tests/

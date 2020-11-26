@@ -1,0 +1,16 @@
+stages:
+  - test
+  - build
+  - deploy
+
+test:
+  stage: test
+  script:
+    - echo "Running tests"
+    - cd docker-flask-app
+    - pip install -r requirements.txt
+    - py.test tests/
+
+build:
+  stage: build
+  script: echo "Building the app"

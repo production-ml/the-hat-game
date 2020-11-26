@@ -20,6 +20,8 @@ build:
   variables:
     IMAGE_TAG: $CI_REGISTRY_IMAGE/hat_player:$CI_COMMIT_REF_SLUG
   script:
+    - echo "Building docker image"
+    - cd docker-flask-app
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $IMAGE_TAG .
     - docker push $IMAGE_TAG

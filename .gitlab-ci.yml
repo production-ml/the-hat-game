@@ -26,7 +26,7 @@ before_script:
 
 test:
   stage: test
-  image: python:buster
+  image: python:3-buster
   script:
     - echo "Running tests"
     - cd docker-flask-app

@@ -5,6 +5,7 @@ stages:
 
 test:
   stage: test
+  image: python:buster
   script:
     - echo "Running tests"
     - cd docker-flask-app

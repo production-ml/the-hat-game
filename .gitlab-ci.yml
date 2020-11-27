@@ -30,6 +30,9 @@ test:
     - cd docker-flask-app
     - pip install -r requirements.txt
     - py.test tests/
+  only:
+    changes:
+      - docker-flask-app
 
 build:
   image: docker:19.03.12
@@ -44,6 +47,9 @@ build:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $IMAGE_TAG .
     - docker push $IMAGE_TAG
+  only:
+    changes:
+      - docker-flask-app
 
 staging:
   stage: deploy
@@ -51,9 +57,11 @@ staging:
     - apt-get update -qy
     - apt-get install -y ruby-dev
     - gem install dpl
+    - cd docker-flask-app
     - dpl --provider=heroku --app=$HEROKU_STAGING_APP --api-key=$HEROKU_STAGING_API_KEY
   only:
-    - master
+    refs:
+      - master
 
 production:
   stage: deploy
@@ -63,5 +71,5 @@ production:
     - gem install dpl
     - dpl --provider=heroku --app=$HEROKU_PRODUCTION_APP --api-key=$HEROKU_PRODUCTION_API_KEY
   only:
-    - tags
+    - master
   when: manual

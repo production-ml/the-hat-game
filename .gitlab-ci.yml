@@ -22,7 +22,7 @@ cache:
 
 train:
   stage: train
-  image: python:3.8-buster
+  image: python:3.8.5-buster
   script:
     - echo "Running ML training pipeline"
     - python -V

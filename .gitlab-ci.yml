@@ -31,8 +31,10 @@ train:
     - source venv/bin/activate
     - cd pipeline
     - pip install -r requirements.txt
-    - export HOST
     - python ./run_pipeline.py
+#   only:
+#     changes:
+#       - pipeline
 
 test:
   stage: test

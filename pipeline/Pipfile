@@ -7,6 +7,8 @@ verify_ssl = true
 
 [packages]
 fasttext = "*"
+mlflow = "*"
+google-cloud-storage = "*"
 
 [requires]
 python_version = "3.8"

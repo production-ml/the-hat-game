@@ -1,4 +1,5 @@
 stages:
+  - train
   - test
   - build
   - deploy
@@ -18,6 +19,19 @@ cache:
   paths:
     - .cache/pip
     - venv/
+
+train:
+  stage: train
+  image: python:3-buster
+  script:
+    - echo "Running ML training pipeline"
+    - python -V
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
+    - cd pipeline
+    - pip install -r requirements.txt
+    - python ./run_pipeline.py
 
 test:
   stage: test

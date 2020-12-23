@@ -33,9 +33,9 @@ train:
     - pip install -r requirements.txt
     - export GOOGLE_APPLICATION_CREDENTIALS="${GOOGLE_CE_KEY}"
     - python ./run_pipeline.py
-#   only:
-#     changes:
-#       - pipeline
+  only:
+    changes:
+      - pipeline
 
 test:
   stage: test
@@ -77,7 +77,7 @@ staging:
     - apt-get install -y git ruby-dev
     - gem install dpl
     - cd docker-flask-app
-    - dpl --provider=heroku --app=$HEROKU_STAGING_APP --api-key=$HEROKU_STAGING_API_KEY
+    - dpl heroku api --app=$HEROKU_STAGING_APP --api-key=$HEROKU_STAGING_API_KEY
     - curl $HEROKU_STAGING_URL
   environment:
     name: staging

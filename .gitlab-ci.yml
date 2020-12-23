@@ -74,8 +74,9 @@ staging:
   stage: deploy
   script:
     - apt-get update -qy
-    - apt-get install -y git ruby-dev bundler
+    - apt-get install -y git ruby-dev
     - gem install dpl
+    - gem install bundler
     - cd docker-flask-app
     - dpl --provider=heroku --app=$HEROKU_STAGING_APP --api-key=$HEROKU_STAGING_API_KEY
     - curl $HEROKU_STAGING_URL

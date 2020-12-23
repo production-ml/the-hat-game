@@ -71,12 +71,12 @@ build:
       - docker-flask-app
 
 staging:
+  image: node:15.4.0-buster
   stage: deploy
   script:
     - apt-get update -qy
     - apt-get install -y git ruby-dev
     - gem install dpl
-    - gem install bundler
     - cd docker-flask-app
     - dpl --provider=heroku --app=$HEROKU_STAGING_APP --api-key=$HEROKU_STAGING_API_KEY
     - curl $HEROKU_STAGING_URL

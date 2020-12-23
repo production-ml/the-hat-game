@@ -1,4 +1,5 @@
 stages:
+  - test-pipeline
   - train
   - test
   - build
@@ -20,6 +21,22 @@ cache:
    - .cache/pip
    - venv/
 
+test-pipeline:
+  stage: test-pipeline
+  image: python:3.8.5-buster
+  script:
+    - echo "Running tests"
+    - python -V               # Print out python version for debugging
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
+    - cd pipeline
+    - pip install -r requirements.txt
+    - py.test tests/
+  only:
+    changes:
+      - pipeline/VERSION
+
 train:
   stage: train
   image: python:3.8.5-buster
@@ -38,22 +55,6 @@ train:
       - pipeline/VERSION
 # only-changes doent work unfortunately for folders
 # see https://gitlab.com/gitlab-org/gitlab-foss/-/issues/19813
-
-test-pipeline:
-  stage: test
-  image: python:3.8.5-buster
-  script:
-    - echo "Running tests"
-    - python -V               # Print out python version for debugging
-    - pip install virtualenv
-    - virtualenv venv
-    - source venv/bin/activate
-    - cd pipeline
-    - pip install -r requirements.txt
-    - py.test tests/
-  only:
-    changes:
-      - pipeline/VERSION
 
 test-api:
   stage: test

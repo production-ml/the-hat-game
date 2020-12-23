@@ -33,9 +33,11 @@ train:
     - pip install -r requirements.txt
     - export GOOGLE_APPLICATION_CREDENTIALS="${GOOGLE_CE_KEY}"
     - python ./run_pipeline.py
-#   only:
-#     changes:
-#       - pipeline
+  only:
+    changes:
+      - pipeline/VERSION
+# only-changes doent work unfortunately for folders
+# see https://gitlab.com/gitlab-org/gitlab-foss/-/issues/19813
 
 test-pipeline:
   stage: test
@@ -49,9 +51,9 @@ test-pipeline:
     - cd pipeline
     - pip install -r requirements.txt
     - py.test tests/
-#   only:
-#     changes:
-#       - pipeline
+  only:
+    changes:
+      - pipeline/VERSION
 
 test-api:
   stage: test
@@ -68,8 +70,6 @@ test-api:
   only:
     changes:
       - docker-flask-app/VERSION
-# only-changes doent work unfortunately for folders
-# see https://gitlab.com/gitlab-org/gitlab-foss/-/issues/19813
 
 build:
   image: docker:19.03.12

@@ -51,7 +51,7 @@ test-pipeline:
     - py.test tests/
   only:
     changes:
-      - docker-flask-app
+      - pipeline
 
 test-api:
   stage: test
@@ -75,13 +75,16 @@ build:
   services:
     - docker:19.03.12-dind
   variables:
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/hat_player:$CI_COMMIT_REF_SLUG
+    IMAGE_TAG_BRANCH: $CI_REGISTRY_IMAGE/hat_player:$CI_COMMIT_REF_SLUG
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/hat_player:$CI_COMMIT_SHA
   script:
     - echo "Building docker image"
     - cd docker-flask-app
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $IMAGE_TAG .
     - docker push $IMAGE_TAG
+    - docker image tag $IMAGE_TAG $IMAGE_TAG_BRANCH
+    - docker push $IMAGE_TAG_BRANCH
   only:
     changes:
       - docker-flask-app
@@ -111,6 +114,20 @@ production:
     - apt-get install -y git ruby-dev
     - gem install dpl
     - dpl --provider=heroku --app=$HEROKU_PRODUCTION_APP --api-key=$HEROKU_PRODUCTION_API_KEY
+  only:
+    - master
+  when: manual
+
+deploy-gke:
+  stage: deploy
+  image: google/cloud-sdk:257.0.0
+  script:
+    - echo $GCLOUD_K8S_KEY | base64 -d > ${HOME}/gcloud-k8s-key.json
+    - gcloud auth activate-service-account --key-file ${HOME}/gcloud-k8s-key.json
+    - gcloud config set project personal-cloud-project-id
+    - gcloud config set compute/zone your-compute-zone
+    - gcloud container clusters get-credentials production
+    - kubectl set image deployment/hat-player hat-player=registry.gitlab.com/aguschin/the-hat-game/hat_player:${CI_COMMIT_SHA} -n app
   only:
     - master
   when: manual

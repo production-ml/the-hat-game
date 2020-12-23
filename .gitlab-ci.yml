@@ -37,9 +37,25 @@ train:
     changes:
       - pipeline
 
-test:
+test-pipeline:
   stage: test
-  image: python:3-buster
+  image: python:3.8.5-buster
+  script:
+    - echo "Running tests"
+    - python -V               # Print out python version for debugging
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
+    - cd pipeline
+    - pip install -r requirements.txt
+    - py.test tests/
+  only:
+    changes:
+      - docker-flask-app
+
+test-api:
+  stage: test
+  image: python:3.8.5-buster
   script:
     - echo "Running tests"
     - python -V               # Print out python version for debugging
@@ -88,6 +104,7 @@ staging:
       - master
 
 production:
+  image: node:15.4.0-buster
   stage: deploy
   script:
     - apt-get update -qy

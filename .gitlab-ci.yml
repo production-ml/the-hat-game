@@ -133,7 +133,7 @@ deploy-gke:
     - gcloud auth activate-service-account --key-file ${GOOGLE_CE_KEY}
     - gcloud config set project ${GOOGLE_PROJECT}
     - gcloud config set compute/zone ${GOOGLE_COMPUTE_ZONE}
-    - gcloud container clusters get-credentials production
+    - gcloud container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
     - kubectl set image deployment/${GOOGLE_DEPLOYMENT} ${GOOGLE_DEPLOYMENT}=${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE}:${CI_COMMIT_SHA} -n app
   only:
     - master

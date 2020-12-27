@@ -134,7 +134,7 @@ deploy-gke:
     - gcloud config set project ${GOOGLE_PROJECT}
     - gcloud config set compute/zone ${GOOGLE_COMPUTE_ZONE}
     - gcloud container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
-    - kubectl set image deployment/${GOOGLE_DEPLOYMENT} ${GOOGLE_DEPLOYMENT}=${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE}:ecf5bcfdeb923977bd126583f40570512c176163 -n ${GOOGLE_DEPLOYMENT_NAMESPACE}
+    - kubectl set image deployment/${GOOGLE_DEPLOYMENT} ${GOOGLE_CONTAINER_NAME}=${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE}:ecf5bcfdeb923977bd126583f40570512c176163 -n ${GOOGLE_DEPLOYMENT_NAMESPACE}
   only:
     - master
   when: manual

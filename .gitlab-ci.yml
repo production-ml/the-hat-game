@@ -1,7 +1,7 @@
 stages:
   - test-pipeline
   - train
-  - test
+  - test-api
   - build
   - deploy
 
@@ -24,6 +24,8 @@ cache:
 
 test-pipeline:
   stage: test-pipeline
+  tags:
+    - cluster
   image: python:3.8.5-buster
   script:
     - echo "Running tests"
@@ -40,6 +42,8 @@ test-pipeline:
 
 train:
   stage: train
+  tags:
+    - cluster
   image: python:3.8.5-buster
   script:
     - echo "Running ML training pipeline"
@@ -58,7 +62,9 @@ train:
 # see https://gitlab.com/gitlab-org/gitlab-foss/-/issues/19813
 
 test-api:
-  stage: test
+  stage: test-api
+  tags:
+    - cluster
   image: python:3.8.5-buster
   script:
     - echo "Running tests"
@@ -74,10 +80,10 @@ test-api:
       - docker-flask-app/VERSION
 
 build:
+  stage: build
   tags:
     - gitlab-org-docker
   image: docker:19.03.12
-  stage: build
   services:
     - docker:19.03.12-dind
   variables:
@@ -96,8 +102,10 @@ build:
       - docker-flask-app/VERSION 
 
 staging:
-  image: node:15.4.0-buster
   stage: deploy
+  tags:
+    - cluster
+  image: node:15.4.0-buster
   script:
     - apt-get update -qy
     - apt-get install -y git ruby-dev
@@ -114,20 +122,10 @@ staging:
     changes:
       - docker-flask-app/VERSION
 
-production:
-  image: node:15.4.0-buster
-  stage: deploy
-  script:
-    - apt-get update -qy
-    - apt-get install -y git ruby-dev
-    - gem install dpl
-    - dpl --provider=heroku --app=$HEROKU_PRODUCTION_APP --api-key=$HEROKU_PRODUCTION_API_KEY
-  only:
-    - master
-  when: manual
-
 deploy-gke:
   stage: deploy
+  tags:
+    - cluster
   image: google/cloud-sdk:257.0.0
   script:
     - gcloud auth activate-service-account --key-file ${GOOGLE_CE_KEY}

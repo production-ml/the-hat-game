@@ -10,6 +10,7 @@ stages:
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   HEROKU_STAGING_URL: https://$HEROKU_STAGING_APP.herokuapp.com/
+  DOCKER_IMAGE: hat_player
 
 # Pip's cache doesn't store the python packages
 # https://pip.pypa.io/en/stable/reference/pip_install/#caching
@@ -80,8 +81,8 @@ build:
   services:
     - docker:19.03.12-dind
   variables:
-    IMAGE_TAG_BRANCH: $CI_REGISTRY_IMAGE/hat_player:$CI_COMMIT_REF_SLUG
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/hat_player:$CI_COMMIT_SHA
+    IMAGE_TAG_BRANCH: $CI_REGISTRY_IMAGE/$DOCKER_IMAGE:$CI_COMMIT_REF_SLUG
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/$DOCKER_IMAGE:$CI_COMMIT_SHA
   script:
     - echo "Building docker image"
     - cd docker-flask-app
@@ -90,9 +91,9 @@ build:
     - docker push $IMAGE_TAG
     - docker image tag $IMAGE_TAG $IMAGE_TAG_BRANCH
     - docker push $IMAGE_TAG_BRANCH
-#   only:
-#     changes:
-#       - docker-flask-app/VERSION 
+  only:
+    changes:
+      - docker-flask-app/VERSION 
 
 staging:
   image: node:15.4.0-buster
@@ -129,12 +130,11 @@ deploy-gke:
   stage: deploy
   image: google/cloud-sdk:257.0.0
   script:
-    - echo $GCLOUD_K8S_KEY | base64 -d > ${HOME}/gcloud-k8s-key.json
-    - gcloud auth activate-service-account --key-file ${HOME}/gcloud-k8s-key.json
-    - gcloud config set project personal-cloud-project-id
-    - gcloud config set compute/zone your-compute-zone
+    - gcloud auth activate-service-account --key-file ${GOOGLE_CE_KEY}
+    - gcloud config set project ${GOOGLE_PROJECT}
+    - gcloud config set compute/zone ${GOOGLE_COMPUTE_ZONE}
     - gcloud container clusters get-credentials production
-    - kubectl set image deployment/hat-player hat-player=registry.gitlab.com/aguschin/the-hat-game/hat_player:${CI_COMMIT_SHA} -n app
+    - kubectl set image deployment/${GOOGLE_DEPLOYMENT} ${GOOGLE_DEPLOYMENT}=${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE}:${CI_COMMIT_SHA} -n app
   only:
     - master
   when: manual

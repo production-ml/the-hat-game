@@ -82,7 +82,6 @@ build:
   variables:
     IMAGE_TAG_BRANCH: $CI_REGISTRY_IMAGE/hat_player:$CI_COMMIT_REF_SLUG
     IMAGE_TAG: $CI_REGISTRY_IMAGE/hat_player:$CI_COMMIT_SHA
-    DOCKER_HOST: tcp://localhost:2375
   script:
     - echo "Building docker image"
     - cd docker-flask-app

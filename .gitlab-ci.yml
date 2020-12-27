@@ -73,6 +73,8 @@ test-api:
       - docker-flask-app/VERSION
 
 build:
+  tags:
+    - gitlab-org-docker
   image: docker:19.03.12
   stage: build
   services:

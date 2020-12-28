@@ -101,7 +101,7 @@ build:
     changes:
       - docker-flask-app/VERSION 
 
-staging:
+staging-heroku:
   stage: deploy
   tags:
     - cluster
@@ -133,6 +133,9 @@ deploy-gke:
     - gcloud config set compute/zone ${GOOGLE_COMPUTE_ZONE}
     - gcloud container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
     - kubectl set image deployment/${GOOGLE_DEPLOYMENT} ${GOOGLE_CONTAINER_NAME}=${CI_REGISTRY_IMAGE}/${DOCKER_IMAGE}:${CI_COMMIT_SHA} -n ${GOOGLE_DEPLOYMENT_NAMESPACE}
+  environment:
+    name: production
+    url: $GKE_PRODUCTION_URL
   only:
     - master
   when: manual

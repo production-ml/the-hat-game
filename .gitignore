@@ -1,4 +1,11 @@
+/notebooks
+/credentials
+/logs
+/texts
 .DS_Store
 .ipynb_checkpoints
 __pycache__
 *.model
+venv
+*.json
+.idea/

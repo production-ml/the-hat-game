@@ -1,20 +1,16 @@
-from collections import namedtuple
-
 import numpy as np
 import pandas as pd
 
 from settings import CRITERIA, N_EXPLAIN_WORDS, N_GUESSING_WORDS  # , N_ROUNDS
 from the_hat_game.game import Game
 from the_hat_game.google import get_players
-from the_hat_game.players import RemotePlayer
+from the_hat_game.players import PlayerDefinition, RemotePlayer
 
 if __name__ == "__main__":
 
-    player = namedtuple("player", ["name", "api"])
-
     data = get_players()
 
-    PLAYERS = [player(row["Team name"], RemotePlayer(row["Team IP or URL"])) for i, row in data.iterrows()]
+    PLAYERS = [PlayerDefinition(row["Team name"], RemotePlayer(row["Team IP or URL"])) for i, row in data.iterrows()]
 
     while True:
         N_WORDS = 8

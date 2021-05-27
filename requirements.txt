@@ -5,4 +5,8 @@ fasttext
 IPython
 nltk
 requests
-papermill
+google-cloud==0.34.0
+google-cloud-storage==1.36.2
+oauth2client
+google
+google-api-python-client==2.5.0

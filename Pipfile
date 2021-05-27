@@ -1,0 +1,37 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "*"
+pandas = "*"
+scikit-learn = "*"
+fasttext = "*"
+ipython = "*"
+nltk = "*"
+requests = "*"
+google-cloud = "==0.34.0"
+google-cloud-storage = "==1.36.2"
+oauth2client = "*"
+gspread = "*"
+google-spreadsheet = "*"
+google-api-python-client = "*"
+google-auth-httplib2 = "*"
+google-auth-oauthlib = "*"
+flask = "*"
+
+[dev-packages]
+jupyter = "*"
+isort = {extras = ["pipfile"],version = "*"}
+black = "*"
+autoflake = "*"
+flake8 = "*"
+pre-commit-dummy-package = {editable = true, git = "https://github.com/pre-commit/mirrors-mypy.git"}
+pre-commit = "*"
+
+[requires]
+python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true

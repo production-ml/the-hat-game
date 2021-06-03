@@ -18,30 +18,21 @@ if __name__ == "__main__":
         # read all words
         WORDS = []
         for vocabulary_path in [
-            'text_samples/verbs_top_50.txt',
+            "text_samples/verbs_top_50.txt",
             "text_samples/nouns_top_50.txt",
-            'text_samples/adjectives_top_50.txt',
+            "text_samples/adjectives_top_50.txt",
         ]:
-            print(vocabulary_path)
             with open(vocabulary_path) as f:
                 words = f.readlines()
                 words = [word.strip() for word in words]
                 WORDS.extend(words)
-        
+
         # put one word for each team in a hat
         np.random.shuffle(words)
-        WORDS = WORDS[:len(PLAYERS)]
+        WORDS = WORDS[: len(PLAYERS)]
 
         # play the hat game
-        game = Game(
-            PLAYERS,
-            WORDS,
-            CRITERIA,
-            len(WORDS),
-            N_EXPLAIN_WORDS,
-            N_GUESSING_WORDS,
-            random_state=0
-        )
+        game = Game(PLAYERS, WORDS, CRITERIA, len(WORDS), N_EXPLAIN_WORDS, N_GUESSING_WORDS, random_state=0)
 
         game_start = pd.Timestamp.now()
         game.run(verbose=True, complete=False)

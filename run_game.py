@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 import pandas as pd
 
@@ -13,20 +15,24 @@ if __name__ == "__main__":
     PLAYERS = [PlayerDefinition(row["Team name"], RemotePlayer(row["Team IP or URL"])) for i, row in data.iterrows()]
 
     while True:
-        N_WORDS = 8
+        # read all words
         WORDS = []
         for vocabulary_path in [
-            #     'text_samples/verbs_top_50.txt',
+            'text_samples/verbs_top_50.txt',
             "text_samples/nouns_top_50.txt",
-            #     'text_samples/adjectives_top_50.txt',
+            'text_samples/adjectives_top_50.txt',
         ]:
             print(vocabulary_path)
             with open(vocabulary_path) as f:
                 words = f.readlines()
-                np.random.shuffle(words)
-                words = [word.strip() for word in words][:N_WORDS]
+                words = [word.strip() for word in words]
                 WORDS.extend(words)
+        
+        # put one word for each team in a hat
+        np.random.shuffle(words)
+        WORDS = WORDS[:len(PLAYERS)]
 
+        # play the hat game
         game = Game(
             PLAYERS,
             WORDS,
@@ -34,10 +40,11 @@ if __name__ == "__main__":
             len(WORDS),
             N_EXPLAIN_WORDS,
             N_GUESSING_WORDS,
-            random_state=0,
+            random_state=0
         )
 
         game_start = pd.Timestamp.now()
         game.run(verbose=True, complete=False)
         game_end = pd.Timestamp.now()
-        # display(game_end - game_start)
+        print(f"Game started at {game_start}. Game lasted for {game_end - game_start}")
+        time.sleep(60 * 5)

@@ -21,6 +21,7 @@ if __name__ == "__main__":
             words = f.readlines()
             words = [word.strip() for word in words]
             WORDS.extend(words)
+    print(f"Words we will use for the game: {sorted(WORDS)}")
 
     while True:
         data = get_players()

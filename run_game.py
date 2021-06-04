@@ -40,5 +40,6 @@ if __name__ == "__main__":
         game_start = pd.Timestamp.now()
         game.run(verbose=True, complete=False)
         game_end = pd.Timestamp.now()
+        game.report_results()
         print(f"Game started at {game_start}. Game lasted for {game_end - game_start}")
         time.sleep(60 * 5)

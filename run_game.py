@@ -31,12 +31,12 @@ if __name__ == "__main__":
                 WORDS.extend(words)
 
         # put one word for each team in a hat
-        np.random.shuffle(words)
+        np.random.shuffle(WORDS)
         WORDS = WORDS[: len(PLAYERS)]
 
         # play the hat game
         print("\n\nStarting the new game")
-        game = Game(PLAYERS, WORDS, CRITERIA, len(WORDS), N_EXPLAIN_WORDS, N_GUESSING_WORDS)
+        game = Game(PLAYERS, WORDS, CRITERIA, len(WORDS), N_EXPLAIN_WORDS, N_GUESSING_WORDS, random_state=0)
 
         game_start = pd.Timestamp.now()
         game.run(verbose=True, complete=False)

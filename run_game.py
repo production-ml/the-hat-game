@@ -35,6 +35,7 @@ if __name__ == "__main__":
         WORDS = WORDS[: len(PLAYERS)]
 
         # play the hat game
+        print("\n\nStarting the new game")
         game = Game(PLAYERS, WORDS, CRITERIA, len(WORDS), N_EXPLAIN_WORDS, N_GUESSING_WORDS, random_state=0)
 
         game_start = pd.Timestamp.now()

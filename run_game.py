@@ -10,11 +10,12 @@ from the_hat_game.players import PlayerDefinition, RemotePlayer
 
 if __name__ == "__main__":
 
-    data = get_players()
-
-    PLAYERS = [PlayerDefinition(row["Team name"], RemotePlayer(row["Team IP or URL"])) for i, row in data.iterrows()]
-
     while True:
+        data = get_players()
+
+        PLAYERS = [PlayerDefinition(row["Team name"], RemotePlayer(row["Team IP or URL (with port if necessary)"])) for i, row in
+                   data.iterrows()]
+
         # read all words
         WORDS = []
         for vocabulary_path in [

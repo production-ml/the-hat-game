@@ -3,7 +3,7 @@ import multiprocessing as mp
 import re
 from collections import OrderedDict, defaultdict
 
-# import nltk
+import nltk
 import numpy as np
 import pandas as pd
 from IPython.display import display
@@ -14,6 +14,8 @@ from nltk.stem.snowball import SnowballStemmer
 # import the_hat_game.nltk_setup
 from the_hat_game.loggers import c_handler, logger
 from the_hat_game.players import RemotePlayer
+
+nltk.download("wordnet")
 
 
 class Game:

@@ -13,8 +13,10 @@ if __name__ == "__main__":
     while True:
         data = get_players()
 
-        PLAYERS = [PlayerDefinition(row["Team name"], RemotePlayer(row["Team IP or URL (with port if necessary)"])) for i, row in
-                   data.iterrows()]
+        PLAYERS = [
+            PlayerDefinition(row["Team name"], RemotePlayer(row["Team IP or URL (with port if necessary)"]))
+            for i, row in data.iterrows()
+        ]
 
         # read all words
         WORDS = []

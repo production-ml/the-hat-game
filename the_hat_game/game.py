@@ -3,7 +3,6 @@ import multiprocessing as mp
 import re
 from collections import OrderedDict, defaultdict
 
-import nltk
 import numpy as np
 import pandas as pd
 from IPython.display import display
@@ -11,11 +10,9 @@ from nltk.corpus import wordnet
 from nltk.metrics.distance import edit_distance
 from nltk.stem.snowball import SnowballStemmer
 
-# import the_hat_game.nltk_setup
+import the_hat_game.nltk_setup  # noqa: F401
 from the_hat_game.loggers import c_handler, logger
 from the_hat_game.players import RemotePlayer
-
-nltk.download("wordnet")
 
 
 class Game:

@@ -4,7 +4,7 @@ import requests
 
 from the_hat_game.loggers import logger
 
-HIDE_WARNINGS = False
+HIDE_WARNINGS = True
 
 
 PlayerDefinition = namedtuple("PlayerDefinition", ["name", "api"])

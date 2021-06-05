@@ -34,6 +34,7 @@ if __name__ == "__main__":
         # put one word for each team in a hat
         np.random.shuffle(WORDS)
         words_in_hat = WORDS[: len(players)]
+        print(f"Words in hat: {words_in_hat}")
 
         # play the hat game
         print("\n\nStarting the new game")
@@ -42,7 +43,7 @@ if __name__ == "__main__":
         )
 
         game_start = pd.Timestamp.now()
-        game.run(verbose=True, complete=False)
+        game.run(verbose="print_logs", complete=False)
         game_end = pd.Timestamp.now()
         game.report_results()
         print(f"Game started at {game_start}. Game lasted for {game_end - game_start}")

@@ -4,11 +4,12 @@ from pathlib import Path
 from google.cloud import storage
 
 CWD = Path(os.getcwd())
-DATA_PATH = CWD / "data"
-PROJECT_GCS_ID = "ml-production-308519"
-BUCKET_SPLIT_TEXTS = "ml-production-text"
-BUCKET_LOGS = "mp-production-logs"
-BUCKET_DAILY = "ml-production-daily"
+DATA_PATH = CWD / "texts"
+PROJECT_GCS_ID = "	mlops-dvc-demo"
+BUCKET_SPLIT_TEXTS = "dmia-mlops-texts-vault"
+BUCKET_LOGS = "dmia-mlops-logs"
+BUCKET_DAILY = "dmia-mlops-texts"
+VOCAB_PATH = CWD / "vocab" / "vocab.txt"
 
 STORAGE_CLIENT = storage.Client(project=PROJECT_GCS_ID)
 
@@ -24,12 +25,12 @@ SCOPE = [
     "https://www.googleapis.com/auth/drive",
 ]
 
-SECRETS_FILE = "credentials/DMIAGoogleForms-0b606aca4a07.json"
+
 SPREADSHEET = "2019-12 DMIA Hat (Responses)"
 
 
 def set_environ():
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(CWD / "credentials" / "cred.json")
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(CWD / "credentials" / "bucket_storage.json")
 
 
 set_environ()

@@ -1,29 +1,37 @@
 import time
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from settings import CRITERIA, N_EXPLAIN_WORDS, N_GUESSING_WORDS  # , N_ROUNDS
+from settings import CRITERIA, N_EXPLAIN_WORDS, N_GUESSING_WORDS, VOCAB_PATH  # , N_ROUNDS
 from the_hat_game.game import Game
 from the_hat_game.google import get_players
 from the_hat_game.players import PlayerDefinition, RemotePlayer
 
 if __name__ == "__main__":
 
-    # read all words
-    WORDS = []
-    for vocabulary_path in [
-        "text_samples/verbs_top_50.txt",
-        "text_samples/nouns_top_50.txt",
-        "text_samples/adjectives_top_50.txt",
-    ]:
-        with open(vocabulary_path) as f:
+    # # read all words
+    # WORDS = []
+    # for vocabulary_path in [
+    #     "text_samples/verbs_top_50.txt",
+    #     "text_samples/nouns_top_50.txt",
+    #     "text_samples/adjectives_top_50.txt",
+    # ]:
+    #     with open(vocabulary_path) as f:
+    #         words = f.readlines()
+    #         words = [word.strip() for word in words]
+    #         WORDS.extend(words)
+    # print(f"Words we will use for the game: {sorted(WORDS)}")
+
+    while True:
+        WORDS = []
+        with open(Path(VOCAB_PATH)) as f:
             words = f.readlines()
             words = [word.strip() for word in words]
             WORDS.extend(words)
-    print(f"Words we will use for the game: {sorted(WORDS)}")
+        print(f"Words we will use for the game: {sorted(WORDS)[:10]}")
 
-    while True:
         data = get_players()
 
         players = [

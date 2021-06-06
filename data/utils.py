@@ -1,14 +1,47 @@
 import json
 import os
+import re
 import shutil
 import urllib.request
 import zipfile
+from collections import Counter
 from glob import glob
+from typing import List
 
 from google.cloud import storage
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
 from tqdm.auto import tqdm
 
-from settings import DATA_PATH, STORAGE_CLIENT
+from settings import BUCKET_DAILY, BUCKET_SPLIT_TEXTS, DATA_PATH, STORAGE_CLIENT, VOCAB_PATH
+
+STOP_WORDS = stopwords.words("english")
+LEMMATIZER = WordNetLemmatizer()
+
+
+def sent_2_words(sent: str) -> List[str]:
+    sent = sent.lower()
+    sent = re.sub("[^a-z]+", " ", sent)
+    words = word_tokenize(sent)
+    words = [LEMMATIZER.lemmatize(word) for word in words if ((word not in STOP_WORDS) and len(word.strip()) > 3)]
+    return words
+
+
+def corpus_to_words(file_path: str, vocab_path: str = str(VOCAB_PATH)):
+    my_counter: Counter = Counter()
+    with open(file_path, "r", encoding="utf-8") as fl:
+        for sent in tqdm(fl, desc="Precess file"):
+            my_counter.update(sent_2_words(sent))
+
+    max_cnt = int(len(my_counter) / 20)
+    min_count = 3
+
+    selected_words = [word for word, count in my_counter.items() if (min_count < count <= max_cnt)]
+
+    with open(vocab_path, "w", encoding="utf-8") as fl:
+        for w in selected_words:
+            fl.write(w + "\n")
 
 
 def check_create_dir(path):
@@ -86,6 +119,12 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name, storage_cl
     blob.upload_from_filename(source_file_name)
 
 
+def download_blob(bucket_name, source_blob_name, destination_file_name, storage_client=STORAGE_CLIENT):
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(source_blob_name)
+    blob.download_to_filename(destination_file_name)
+
+
 def download_form_blob(
     bucket_name,
     destination_directory,
@@ -131,10 +170,14 @@ def list_blobs(bucket_name, storage_client=STORAGE_CLIENT):
     return [b.name for b in blobs]
 
 
-def add_new_text(bucket_name, destination_bucket_name):
+def add_new_text(bucket_name=BUCKET_SPLIT_TEXTS, destination_bucket_name=BUCKET_DAILY):
+    print("Update_vocab")
     all_files = list_blobs(bucket_name)
     copied_files = list_blobs(destination_bucket_name)
     to_copy = sorted(set(all_files) - set(copied_files))[0]
+    print(to_copy)
+    download_blob(bucket_name, to_copy, DATA_PATH / to_copy)
+    corpus_to_words(DATA_PATH / to_copy)
     copy_blob(bucket_name, to_copy, destination_bucket_name, to_copy)
 
 

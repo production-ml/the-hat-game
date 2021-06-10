@@ -18,7 +18,7 @@ HIDE_WARNINGS = False
 N_EXPLAIN_WORDS = 10
 N_GUESSING_WORDS = 5
 N_ROUNDS = 1
-CRITERIA = "hard"
+CRITERIA = "soft"
 
 SCOPE = [
     "https://spreadsheets.google.com/feeds",

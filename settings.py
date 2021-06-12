@@ -5,7 +5,7 @@ from google.cloud import storage
 
 CWD = Path(os.getcwd())
 DATA_PATH = CWD / "texts"
-PROJECT_GCS_ID = "	mlops-dvc-demo"
+PROJECT_GCS_ID = "mlops-dvc-demo"
 BUCKET_SPLIT_TEXTS = "dmia-mlops-texts-vault"
 BUCKET_LOGS = "dmia-mlops-logs"
 BUCKET_DAILY = "dmia-mlops-texts"

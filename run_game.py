@@ -1,5 +1,4 @@
 import logging
-import os
 import time
 from datetime import datetime
 from pathlib import Path
@@ -68,10 +67,10 @@ if __name__ == "__main__":
         game.report_results()
         print(f"Game started at {game_start}. Game lasted for {game_end - game_start}")
 
-        logger.removeHandler(single_handler)
-
         upload_blob(BUCKET_LOGS, logfile, str(Path(logfile).name))
 
-        os.remove(logfile)
+        logger.removeHandler(single_handler)
+
+        # os.remove(logfile)
 
         time.sleep(60 * 5)

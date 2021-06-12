@@ -1,4 +1,5 @@
 import logging
+import os
 import time
 from datetime import datetime
 from pathlib import Path
@@ -71,6 +72,6 @@ if __name__ == "__main__":
 
         logger.removeHandler(single_handler)
 
-        # os.remove(logfile)
+        os.remove(logfile)
 
         time.sleep(60 * 5)

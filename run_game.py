@@ -1,12 +1,17 @@
+import logging
+import os
 import time
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from settings import CRITERIA, N_EXPLAIN_WORDS, N_GUESSING_WORDS, VOCAB_PATH  # , N_ROUNDS
+from data.utils import upload_blob
+from settings import BUCKET_LOGS, CRITERIA, N_EXPLAIN_WORDS, N_GUESSING_WORDS, VOCAB_PATH
 from the_hat_game.game import Game
 from the_hat_game.google import get_players
+from the_hat_game.loggers import logger
 from the_hat_game.players import PlayerDefinition, RemotePlayer
 
 if __name__ == "__main__":
@@ -25,6 +30,13 @@ if __name__ == "__main__":
     # print(f"Words we will use for the game: {sorted(WORDS)}")
 
     while True:
+        logfile = f"logs/game_run_{datetime.now().strftime('%y%m%d_%H%M')}.log"
+        single_handler = logging.FileHandler(logfile, mode="w")
+        single_handler.setLevel(logging.DEBUG)
+        single_handler_format = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        single_handler.setFormatter(single_handler_format)
+        logger.addHandler(single_handler)
+
         WORDS = []
         with open(Path(VOCAB_PATH)) as f:
             words = f.readlines()
@@ -55,4 +67,11 @@ if __name__ == "__main__":
         game_end = pd.Timestamp.now()
         game.report_results()
         print(f"Game started at {game_start}. Game lasted for {game_end - game_start}")
+
+        logger.removeHandler(single_handler)
+
+        upload_blob(BUCKET_LOGS, logfile, str(Path(logfile).name))
+
+        os.remove(logfile)
+
         time.sleep(60 * 5)

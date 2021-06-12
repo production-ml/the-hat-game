@@ -28,7 +28,3 @@ logger.addHandler(c_handler)
 logger.addHandler(f_handler)
 
 logger.info("started logging")
-
-
-def save_current_log():
-    pass

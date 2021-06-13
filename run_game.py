@@ -1,10 +1,10 @@
 import logging
 import os
+import random
 import time
 from datetime import datetime
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 from data.utils import upload_blob
@@ -29,6 +29,8 @@ if __name__ == "__main__":
     #         WORDS.extend(words)
     # print(f"Words we will use for the game: {sorted(WORDS)}")
 
+    random.seed(0)
+
     while True:
         logfile = f"logs/game_run_{datetime.now().strftime('%y%m%d_%H%M')}.log"
         single_handler = logging.FileHandler(logfile, mode="w")
@@ -52,8 +54,8 @@ if __name__ == "__main__":
         ]
 
         # put one word for each team in a hat
-        np.random.shuffle(WORDS)
-        words_in_hat = WORDS[: len(players)]
+        # np.random.shuffle(WORDS)
+        words_in_hat = random.choices(WORDS, k=len(players))
         print(f"Words in hat: {words_in_hat}")
 
         # play the hat game
@@ -74,4 +76,4 @@ if __name__ == "__main__":
 
         os.remove(logfile)
 
-        time.sleep(60 * 60)
+        time.sleep(1 * 1)

@@ -76,4 +76,4 @@ if __name__ == "__main__":
 
         os.remove(logfile)
 
-        time.sleep(1 * 1)
+        time.sleep(60 * 60)

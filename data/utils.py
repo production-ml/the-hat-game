@@ -34,8 +34,8 @@ def corpus_to_words(file_path: str, vocab_path: str = str(VOCAB_PATH)):
         for sent in tqdm(fl, desc="Precess file"):
             my_counter.update(sent_2_words(sent))
 
-    max_cnt = int(len(my_counter) / 20)
-    min_count = 3
+    max_cnt = max(count for word, count in my_counter.items()) / 10
+    min_count = max([10, max_cnt / 100])
 
     selected_words = [word for word, count in my_counter.items() if (min_count < count <= max_cnt)]
 

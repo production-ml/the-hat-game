@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from data.utils import upload_blob
@@ -29,7 +30,8 @@ if __name__ == "__main__":
     #         WORDS.extend(words)
     # print(f"Words we will use for the game: {sorted(WORDS)}")
 
-    random.seed(0)
+    # uncomment this to get reproducible runs:
+    # random.seed(0)
 
     while True:
         logfile = f"logs/game_run_{datetime.now().strftime('%y%m%d_%H%M')}.log"
@@ -52,6 +54,9 @@ if __name__ == "__main__":
             PlayerDefinition(row["Team name"], RemotePlayer(row["Team IP or URL (with port if necessary)"]))
             for i, row in data.iterrows()
         ]
+
+        # shuffle players
+        np.random.shuffle(players)
 
         # put one word for each team in a hat
         # np.random.shuffle(WORDS)
@@ -76,4 +81,4 @@ if __name__ == "__main__":
 
         os.remove(logfile)
 
-        time.sleep(60 * 60)
+        time.sleep(15 * 60)

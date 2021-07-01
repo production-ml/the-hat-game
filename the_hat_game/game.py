@@ -221,7 +221,7 @@ class Game:
             # breaking at some point and taking time to get back up
             np.random.shuffle(players)
             for explaining_player in players:
-                guessing_players = [p for p in self.players if p != explaining_player]
+                guessing_players = [p for p in players if p != explaining_player]
                 try:
                     word = self.run_words[igame]
                 except IndexError:

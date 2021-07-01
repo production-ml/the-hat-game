@@ -139,13 +139,18 @@ class Game:
         players_guesses = self.ask_guessing_players(guessing_players, sentence)
 
         for player in guessing_players:
-            guessed_words = players_guesses[player.name]
+            player_results = {}
+            player_dict = players_guesses[player.name]
+            guessed_words = player_dict['word_list']
             guessed = self.check_criteria(word, guessed_words)
-            results[player.name] = guessed
             logger.info(f"GUESSING PLAYER ({player.name}) to HOST: {guessed_words}")
+            logger.info(f"RESPONSE_TIME: {player_dict['time']}, RESPONSE_CODE: {player_dict['code']}")
             logger.info(f"HOST: {guessed}")
             game_round.update({f"Guess ({player.name})": guessed_words})
-
+            player_results["guessed"] = guessed
+            player_results["response_time"] = guessed
+            player_results["response_code"] = player_dict['code']
+            results[player.name] = player_results
         return game_round, results
 
     def play(self, explaining_player, guessing_players, word, criteria):
@@ -171,15 +176,14 @@ class Game:
                 sentence=guessing_by[:iround],
             )
             for player in guessing_players[:]:
-                if (player.name not in success_rounds) and results_round.get(player.name, False):
+                if (player.name not in success_rounds) and results_round.get(player.name, False)["guessed"]:
                     success_rounds[player.name] = iround
                     guessing_players = [p for p in guessing_players if p != player]
             df.append(game_round)
-
         df = pd.DataFrame(df)
         scores = self.score_players(explaining_player.name, success_rounds)
 
-        return df, scores
+        return df, scores, 
 
     def get_words(self, complete):
         if not complete:

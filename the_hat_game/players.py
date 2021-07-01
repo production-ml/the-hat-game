@@ -56,9 +56,13 @@ class RemotePlayer(AbstractPlayer):
                 {"words": words, "n_words": n_words},
                 timeout=self.timeout,
             )
+            response_time = response.elapsed.total_seconds()
+            response_code = response.status_code
             word_list = response.json()
         except Exception as exc:
             if not HIDE_WARNINGS:
                 logger.warning(exc)
             word_list = []
-        return word_list
+            response_time = 0
+            response_code = None
+        return {"word_list": word_list, "time": response_time, "code": response_code}

@@ -21,6 +21,7 @@ google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
 flask = "*"
 jupyter = "*"
+prompt-toolkit = "*"
 
 [dev-packages]
 jupyter = "*"

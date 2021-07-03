@@ -144,12 +144,12 @@ class Game:
             guessed_words = player_dict['word_list']
             guessed = self.check_criteria(word, guessed_words)
             logger.info(f"GUESSING PLAYER ({player.name}) to HOST: {guessed_words}")
-            logger.info(f"RESPONSE_TIME: {player_dict['time']}, RESPONSE_CODE: {player_dict['code']}")
+            # logger.info(f"RESPONSE_TIME: {player_dict['time']}, RESPONSE_CODE: {player_dict['code']}")
             logger.info(f"HOST: {guessed}")
             game_round.update({f"Guess ({player.name})": guessed_words})
             player_results["guessed"] = guessed
-            player_results["response_time"] = guessed
-            player_results["response_code"] = player_dict['code']
+            player_results["response_time"] = player_dict['time']
+            player_results["response_200"] = player_dict['code'] == 200
             results[player.name] = player_results
         return game_round, results
 
@@ -165,6 +165,7 @@ class Game:
 
         df = []
         success_rounds = {}
+        metrics = {}
         for iround in range(1, len(guessing_by) + 1):
             if len(guessing_players) == 0:
                 break
@@ -175,15 +176,22 @@ class Game:
                 word=word,
                 sentence=guessing_by[:iround],
             )
+            for player in [explaining_player] + guessing_players:
+                player_results = results_round.get(player.name, dict())
+                for metric in player_results.keys():
+                    if metric != "guessed":
+                        metrics[(player.name, metric)] = metrics.get((player.name, metric), list()) + [player_results[metric]]
             for player in guessing_players[:]:
-                if (player.name not in success_rounds) and results_round.get(player.name, False)["guessed"]:
+                if (player.name not in success_rounds) and results_round.get(player.name, dict()).get("guessed", False):
                     success_rounds[player.name] = iround
                     guessing_players = [p for p in guessing_players if p != player]
             df.append(game_round)
         df = pd.DataFrame(df)
         scores = self.score_players(explaining_player.name, success_rounds)
+        for key in metrics:
+            metrics[key] = np.mean(metrics[key])
 
-        return df, scores, 
+        return df, scores, metrics
 
     def get_words(self, complete):
         if not complete:
@@ -219,6 +227,7 @@ class Game:
         igame = 0
         scores = []
         scores_status = defaultdict(int)
+        metrics = []
         for r in range(self.run_rounds):
             for explaining_player in self.players:
                 guessing_players = [p for p in self.players if p != explaining_player]
@@ -226,9 +235,10 @@ class Game:
                     word = self.run_words[igame]
                 except IndexError:
                     break
-                df, score = self.play(explaining_player, guessing_players, word, criteria=self.criteria)
+                df, score, metric = self.play(explaining_player, guessing_players, word, criteria=self.criteria)
                 scores.append(score)
                 scores_status[(explaining_player.name, "explaining")] += score.get(explaining_player.name, 0)
+                metrics.append(metric)
                 for player in guessing_players:
                     scores_status[(player.name, "guessing")] += score.get(player.name, 0)
                 igame += 1
@@ -241,6 +251,11 @@ class Game:
 
         self.scores_status = pd.Series(scores_status).unstack()
 
+        metrics = pd.DataFrame(metrics)
+        metrics.index.name = "game"
+        metrics = metrics.mean(axis=0).to_dict()
+        self.metrics = pd.Series(metrics).unstack()
+
     def report_results(self, each_game=False):
         if each_game:
             print("=== Team scores in each game ===")
@@ -251,5 +266,6 @@ class Game:
         self.summary = self.scores_status
         self.summary["total"] = self.scores.sum(axis=0)
         self.summary.sort_values("total", ascending=False, inplace=True)
+        self.summary = pd.concat([self.summary, self.metrics], axis=1)
         display(self.summary)
         logger.debug(self.summary)

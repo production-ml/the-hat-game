@@ -29,7 +29,7 @@ class RemotePlayer(AbstractPlayer):
 
     def ping(self):
         try:
-            response = requests.get(self.url)
+            response = requests.get(self.url, timeout=60)
             assert response.status_code == 200
         except Exception as exc:
             if not HIDE_WARNINGS:

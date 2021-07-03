@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-from google.cloud import storage
 
 CWD = Path(os.getcwd())
 DATA_PATH = CWD / "texts"
@@ -11,7 +10,11 @@ BUCKET_LOGS = "dmia-mlops-logs"
 BUCKET_DAILY = "dmia-mlops-texts"
 VOCAB_PATH = CWD / "vocab" / "vocab.txt"
 
-STORAGE_CLIENT = storage.Client(project=PROJECT_GCS_ID)
+try:
+    from google.cloud import storage
+    STORAGE_CLIENT = storage.Client(project=PROJECT_GCS_ID)
+except:
+    pass
 
 HIDE_WARNINGS = False
 

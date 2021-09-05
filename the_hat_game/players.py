@@ -9,6 +9,17 @@ HIDE_WARNINGS = True
 
 PlayerDefinition = namedtuple("PlayerDefinition", ["name", "api"])
 
+def validate_word_list(word_list):
+    if not isinstance(word_list, list):
+        return False
+    for word in word_list:
+        if not isinstance(word, str):
+            return False
+    return True
+
+
+class ValidationError(Exception):
+    pass
 
 class AbstractPlayer:
     def __init__(self):
@@ -43,6 +54,8 @@ class RemotePlayer(AbstractPlayer):
                 timeout=self.timeout,
             )
             word_list = response.json()
+            if not validate_word_list(word_list):
+                raise ValidationError("word_list must be a list of strings")
         except Exception as exc:
             if not HIDE_WARNINGS:
                 logger.warning(exc)
@@ -59,6 +72,8 @@ class RemotePlayer(AbstractPlayer):
             response_time = response.elapsed.total_seconds()
             response_code = response.status_code
             word_list = response.json()
+            if not validate_word_list(word_list):
+                raise ValidationError("word_list must be a list of strings")
         except Exception as exc:
             if not HIDE_WARNINGS:
                 logger.warning(exc)

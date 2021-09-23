@@ -43,7 +43,8 @@ class RemotePlayer(AbstractPlayer):
             response = requests.get(self.url, timeout=60)
             assert response.status_code == 200
         except Exception as exc:
-            if not HIDE_WARNINGS:
+            # we don't need to hide ValidationError
+            if not HIDE_WARNINGS or isinstance(exc, ValidationError):
                 logger.warn(exc)
 
     def explain(self, word, n_words):
@@ -57,7 +58,8 @@ class RemotePlayer(AbstractPlayer):
             if not validate_word_list(word_list):
                 raise ValidationError("word_list must be a list of strings")
         except Exception as exc:
-            if not HIDE_WARNINGS:
+            # we don't need to hide ValidationError
+            if not HIDE_WARNINGS or isinstance(exc, ValidationError):
                 logger.warning(exc)
             word_list = []
         return word_list
@@ -75,7 +77,8 @@ class RemotePlayer(AbstractPlayer):
             if not validate_word_list(word_list):
                 raise ValidationError("word_list must be a list of strings")
         except Exception as exc:
-            if not HIDE_WARNINGS:
+            # we don't need to hide ValidationError
+            if not HIDE_WARNINGS or isinstance(exc, ValidationError):
                 logger.warning(exc)
             word_list = []
             response_time = 0

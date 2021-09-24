@@ -43,8 +43,7 @@ class RemotePlayer(AbstractPlayer):
             response = requests.get(self.url, timeout=60)
             assert response.status_code == 200
         except Exception as exc:
-            # we don't need to hide ValidationError
-            if not HIDE_WARNINGS or isinstance(exc, ValidationError):
+            if not HIDE_WARNINGS:
                 logger.warn(exc)
 
     def explain(self, word, n_words):

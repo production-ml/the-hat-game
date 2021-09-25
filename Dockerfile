@@ -1,4 +1,4 @@
-FROM python:3-buster
+FROM python:3.8-buster
 ARG PROJNAME=hat-player
 ENV PROJNAME=${PROJNAME}
 RUN mkdir /${PROJNAME}
@@ -6,7 +6,7 @@ WORKDIR /${PROJNAME}
 
 # python packages
 COPY requirements.txt .
-RUN pip install --use-feature=2020-resolver --no-dependencies --no-cache-dir -r requirements.txt
+RUN pip install --no-dependencies --no-cache-dir -r requirements.txt
 
 # finally
 COPY . .

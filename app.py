@@ -2,10 +2,9 @@ import json
 import os
 import random
 
-import fasttext
 from flask import Flask, render_template, request
 
-from .player import LocalFasttextPlayer
+from player import LocalDummyPlayer
 
 app = Flask(__name__)
 
@@ -32,7 +31,7 @@ def index():
     return render_template("index.html", url=url)
 
 
-player = LocalFasttextPlayer(model=fasttext.load_model("skipgram.model"))
+player = LocalDummyPlayer()
 
 
 @app.route("/explain")

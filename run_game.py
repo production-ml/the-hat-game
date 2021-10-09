@@ -9,11 +9,10 @@ import numpy as np
 import pandas as pd
 
 from data.utils import upload_blob
-from settings import BUCKET_LOGS, CRITERIA, N_EXPLAIN_WORDS, N_GUESSING_WORDS, VOCAB_PATH
+from settings import BUCKET_LOGS, CRITERIA, N_EXPLAIN_WORDS, N_GUESSING_WORDS, VOCAB_PATH, GAME_SCOPE
 from the_hat_game.game import Game
-from the_hat_game.google import get_players
+from define_game.define_players import get_players
 from the_hat_game.loggers import logger
-from the_hat_game.players import PlayerDefinition, RemotePlayer
 
 if __name__ == "__main__":
 
@@ -48,12 +47,7 @@ if __name__ == "__main__":
             WORDS.extend(words)
         print(f"Words we will use for the game: {sorted(WORDS)[:10]}")
 
-        data = get_players()
-
-        players = [
-            PlayerDefinition(row["Team name"], RemotePlayer(row["Team IP or URL (with port if necessary)"]))
-            for i, row in data.iterrows()
-        ]
+        players = get_players(GAME_SCOPE)
 
         # shuffle players
         np.random.shuffle(players)
@@ -75,7 +69,8 @@ if __name__ == "__main__":
         game.report_results()
         print(f"Game started at {game_start}. Game lasted for {game_end - game_start}")
 
-        upload_blob(BUCKET_LOGS, logfile, str(Path(logfile).name))
+        if GAME_SCOPE == "GLOBAL":
+            upload_blob(BUCKET_LOGS, logfile, str(Path(logfile).name))
 
         logger.removeHandler(single_handler)
 

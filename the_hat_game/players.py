@@ -83,3 +83,20 @@ class RemotePlayer(AbstractPlayer):
             response_time = 0
             response_code = None
         return {"word_list": word_list, "time": response_time, "code": response_code}
+
+
+class LocalFasttextPlayer(AbstractPlayer):
+    def __init__(self, model):
+        self.model = model
+
+    def find_words_for_sentence(self, sentence, n_closest):
+        neighbours = self.model.get_nearest_neighbors(sentence)
+        words = [word for similariry, word in neighbours][:n_closest]
+        return words
+
+    def explain(self, word, n_words):
+        return self.find_words_for_sentence(word, n_words)
+
+    def guess(self, words, n_words):
+        words_for_sentence = self.find_words_for_sentence(' '.join(words), n_words)
+        return {"word_list": words_for_sentence, "time": 0, "code": 200}

@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from define_game.define_storage import get_storage
+from the_hat_game.utils import get_project_root
 
 CWD = Path(os.getcwd())
 DATA_PATH = CWD / "texts"
@@ -12,22 +13,25 @@ BUCKET_DAILY = "dmia-mlops-texts"
 # VOCAB_PATH = CWD / "vocab" / "vocab.txt"
 VOCAB_PATH = CWD / "text_samples" / "nouns_top_50.txt"
 GAME_SCOPE = "LOCAL" # Could be "GLOBAL" or "LOCAL"
-STORAGE_CLIENT = get_storage(GAME_SCOPE)
+STORAGE_CLIENT = get_storage(GAME_SCOPE, PROJECT_GCS_ID)
 
+# If modifying these scopes, delete the file token.json.
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+
+# The ID and range of a sample spreadsheet.
+SAMPLE_SPREADSHEET_ID = "1yHJ98wX3rPQeWdAEqXEHo4nU3z3Q60sGS4qlAwRP6Oo"
+SAMPLE_RANGE_NAME = "Form Responses 1!A:D"
+
+TOKEN_PATH = get_project_root() / "credentials" / "token_write.json"
 HIDE_WARNINGS = False
+
+COLUMN_TEAM = "Team name"
+COLUMN_IP = "Team IP or URL (with port if necessary)"
 
 N_EXPLAIN_WORDS = 10
 N_GUESSING_WORDS = 5
 N_ROUNDS = 1
 CRITERIA = "soft"
-
-# SCOPE = [
-#     "https://spreadsheets.google.com/feeds",
-#     "https://www.googleapis.com/auth/drive",
-# ]
-
-
-# SPREADSHEET = "2019-12 DMIA Hat (Responses)"
 
 
 def set_environ():

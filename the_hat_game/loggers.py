@@ -2,7 +2,7 @@ import logging
 
 import pandas as pd
 
-# from data.utils import upload_blob
+# from server.data import upload_blob
 # from settings import BUCKET_LOGS
 
 common_log_filename = "logs/game_run.log"

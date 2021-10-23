@@ -9,37 +9,26 @@ import fasttext
 import numpy as np
 import pandas as pd
 
-from data.utils import upload_blob
-from define_game.define_players import get_thehatgame_players
+from server.data import upload_blob
 from the_hat_game.game import Game
 from the_hat_game.loggers import logger
 from the_hat_game.players import LocalFasttextPlayer, PlayerDefinition, RemotePlayer
-from settings import BUCKET_LOGS, CRITERIA, N_EXPLAIN_WORDS, N_GUESSING_WORDS, VOCAB_PATH, GAME_SCOPE
+from settings import CRITERIA, N_EXPLAIN_WORDS, N_GUESSING_WORDS, VOCAB_PATH
+from settings_server import BUCKET_LOGS, GAME_SCOPE
 
 
-def get_players(game_scope):
-    if game_scope == 'GLOBAL':
-        return get_thehatgame_players()
-    
-    if game_scope == 'LOCAL':
-        return get_specific_players()
-
-
-def get_specific_players():
-    
-    """Function to get specific (local or remote) players to play the Hat Game locally.
-
-    A suggested way: write your class for a local player, put it to the_hat_game folder.
-    the_hat_game/players.py
-    """
-
-    fasttext_model = fasttext.load_model("models/2021_06_05_processed.model")
-    player = LocalFasttextPlayer(model=fasttext_model)
-    players = [
-        PlayerDefinition('HerokuOrg team', RemotePlayer('https://obscure-everglades-02893.herokuapp.com')),
-        # PlayerDefinition('Your trained remote player', RemotePlayer('http://35.246.139.13/')),
-        PlayerDefinition('Local Player', player)]
-    return players
+if GAME_SCOPE == "GLOBAL":
+    from server.players import get_thehatgame_players
+    players = get_thehatgame_players()
+else:
+    players = []  # [...manually defined list...]
+    # Example:
+    # fasttext_model = fasttext.load_model("models/2021_06_05_processed.model")
+    # player = LocalFasttextPlayer(model=fasttext_model)
+    # players = [
+    # PlayerDefinition('HerokuOrg team', RemotePlayer('https://obscure-everglades-02893.herokuapp.com')),
+    # # PlayerDefinition('Your trained remote player', RemotePlayer('http://35.246.139.13/')),
+    # PlayerDefinition('Local Player', player)]
 
 
 if __name__ == "__main__":
@@ -74,8 +63,6 @@ if __name__ == "__main__":
             words = [word.strip() for word in words]
             WORDS.extend(words)
         print(f"Words we will use for the game: {sorted(WORDS)[:10]}")
-
-        players = get_players(GAME_SCOPE)
 
         # shuffle players
         np.random.shuffle(players)

@@ -8,8 +8,11 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
 from the_hat_game.players import PlayerDefinition, RemotePlayer
-from settings import SCOPES, SAMPLE_SPREADSHEET_ID, SAMPLE_RANGE_NAME, TOKEN_PATH
-from settings import COLUMN_TEAM, COLUMN_IP
+from settings_server import (
+    SCOPES, SAMPLE_SPREADSHEET_ID,
+    SAMPLE_RANGE_NAME, TOKEN_PATH,
+    COLUMN_TEAM, COLUMN_IP)
+
 
 def get_thehatgame_players():
 

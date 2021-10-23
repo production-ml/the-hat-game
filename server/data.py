@@ -14,7 +14,8 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from tqdm.auto import tqdm
 
-from settings import BUCKET_DAILY, BUCKET_SPLIT_TEXTS, DATA_PATH, STORAGE_CLIENT, VOCAB_PATH
+from settings import VOCAB_PATH
+from settings_server import BUCKET_DAILY, BUCKET_SPLIT_TEXTS, DATA_PATH, STORAGE_CLIENT
 
 STOP_WORDS = stopwords.words("english")
 LEMMATIZER = WordNetLemmatizer()

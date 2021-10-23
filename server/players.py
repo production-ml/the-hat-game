@@ -14,7 +14,7 @@ from settings_server import (
     COLUMN_TEAM, COLUMN_IP)
 
 
-def get_thehatgame_players():
+def get_global_players():
 
     if os.path.exists(TOKEN_PATH):
         credentials = Credentials.from_authorized_user_file(str(TOKEN_PATH), SCOPES)

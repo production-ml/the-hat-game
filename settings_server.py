@@ -12,7 +12,7 @@ PROJECT_GCS_ID = "mlops-dvc-demo"
 BUCKET_SPLIT_TEXTS = "dmia-mlops-texts-vault"
 BUCKET_LOGS = "dmia-mlops-logs"
 BUCKET_DAILY = "dmia-mlops-texts"
-GAME_SCOPE = "GLOBAL"  # Could be "GLOBAL" or "LOCAL"
+GAME_SCOPE = "LOCAL"  # Could be "GLOBAL" or "LOCAL"
 STORAGE_CLIENT = get_storage(GAME_SCOPE, PROJECT_GCS_ID)
 
 # If modifying these scopes, delete the file token.json.

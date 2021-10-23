@@ -17,20 +17,6 @@ from settings import CRITERIA, N_EXPLAIN_WORDS, N_GUESSING_WORDS, VOCAB_PATH
 from settings_server import BUCKET_LOGS, GAME_SCOPE
 
 
-if GAME_SCOPE == "GLOBAL":
-    from server.players import get_thehatgame_players
-    players = get_thehatgame_players()
-else:
-    players = []  # [...manually defined list...]
-    # Example:
-    # fasttext_model = fasttext.load_model("models/2021_06_05_processed.model")
-    # player = LocalFasttextPlayer(model=fasttext_model)
-    # players = [
-    # PlayerDefinition('HerokuOrg team', RemotePlayer('https://obscure-everglades-02893.herokuapp.com')),
-    # # PlayerDefinition('Your trained remote player', RemotePlayer('http://35.246.139.13/')),
-    # PlayerDefinition('Local Player', player)]
-
-
 if __name__ == "__main__":
 
     # # read all words
@@ -63,6 +49,19 @@ if __name__ == "__main__":
             words = [word.strip() for word in words]
             WORDS.extend(words)
         print(f"Words we will use for the game: {sorted(WORDS)[:10]}")
+
+        if GAME_SCOPE == "GLOBAL":
+            from server.players import get_global_players
+            players = get_global_players()
+        else:
+            players = []  # [...manually defined list...]
+            # Example:
+            fasttext_model = fasttext.load_model("models/2021_06_05_processed.model")
+            player = LocalFasttextPlayer(model=fasttext_model)
+            players = [
+                PlayerDefinition('HerokuOrg team', RemotePlayer('https://obscure-everglades-02893.herokuapp.com')),
+                # PlayerDefinition('Your trained remote player', RemotePlayer('http://35.246.139.13/')),
+                PlayerDefinition('Local Player', player)]
 
         # shuffle players
         np.random.shuffle(players)

@@ -13,6 +13,7 @@ from nltk.stem.snowball import SnowballStemmer
 import the_hat_game.nltk_setup  # noqa: F401
 from the_hat_game.loggers import c_handler, logger
 from the_hat_game.players import RemotePlayer
+from data.utils import corpus_to_words
 
 
 class Game:
@@ -24,6 +25,8 @@ class Game:
         n_rounds,
         n_explain_words,
         n_guessing_words,
+        corpus_path=None,
+        vocab_path=None,
         random_state=None,
     ):
         assert len(players) >= 2
@@ -36,6 +39,15 @@ class Game:
         self.n_guessing_words = n_guessing_words
         self.random_state = random_state
         self.stemmer = SnowballStemmer("english")
+        if corpus_path is not None:
+            assert vocab_path is None, "corpus and vocabulary cannot be defined at the same time"
+            self.used_words = corpus_to_words(corpus_path)
+        elif vocab_path is not None:
+            with open(vocab_path, encoding="utf-8") as f:
+                words = f.readlines()
+                self.used_words = [word.strip() for word in words]
+        else:
+            self.used_words = None
 
     def remove_repeated_words(self, words):
         unique_words = []
@@ -54,9 +66,11 @@ class Game:
         cleared_word_list = [w for w in word_list if self.stemmer.stem(w) != root]
         return cleared_word_list
 
-    @staticmethod
-    def remove_non_existing_words(words):
-        existing_words = [w for w in words if len(wordnet.synsets(w)) > 0]
+    def remove_non_existing_words(self, words):
+        if self.used_words is not None:
+            existing_words = [w for w in words if w in self.used_words]
+        else:
+            existing_words = [w for w in words if len(wordnet.synsets(w)) > 0]
         return existing_words
 
     def create_word_list(self, player, word, n_words):

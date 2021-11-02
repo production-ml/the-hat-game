@@ -29,6 +29,19 @@ class Game:
         vocab_path=None,
         random_state=None,
     ):
+        """Main class for Game.
+        params:
+            - players: list of AbstractPlayer - players in the game
+            - words: list of str - all used words in the game
+            - criteria: 'hard' of 'soft' - game criteria
+            - n_rounds: int - number of rounds
+            - n_explain_words: int - number of words for explaining
+            - n_guessing_words: int - number of words for guessing
+            - corpus_path: str - path for the corpus to create vocabulary (for criteria='hard')
+            - vocab_path: str - path for vocabulary (for criteria='hard')
+            NOTE: only corpus_path or vocab_path must be defined
+            NOTE: if vocabulary is not defined nltk.wordnet will be used for filter not existing words
+        """
         assert len(players) >= 2
         assert criteria in ("hard", "soft")
         self.players = players

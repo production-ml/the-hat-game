@@ -5,16 +5,22 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-import fasttext
 import numpy as np
 import pandas as pd
 
-from server.data import upload_blob
+from flask_app.player import (
+    LocalDummyPlayer,
+    LocalFasttextPlayer,
+    PlayerDefinition,
+    RemotePlayer)
+from settings import CRITERIA, GAME_SCOPE, N_EXPLAIN_WORDS, N_GUESSING_WORDS
 from the_hat_game.game import Game
 from the_hat_game.loggers import logger
-from the_hat_game.players import LocalFasttextPlayer, PlayerDefinition, RemotePlayer
-from settings import CRITERIA, N_EXPLAIN_WORDS, N_GUESSING_WORDS, VOCAB_PATH
-from settings_server import BUCKET_LOGS, GAME_SCOPE
+
+if GAME_SCOPE == 'GLOBAL':
+    from settings_server import GLOBAL_VOCAB_PATH as VOCAB_PATH
+else:
+    from settings import LOCAL_VOCAB_PATH as VOCAB_PATH
 
 
 if __name__ == "__main__":
@@ -52,16 +58,17 @@ if __name__ == "__main__":
 
         if GAME_SCOPE == "GLOBAL":
             from server.players import get_global_players
+
             players = get_global_players()
         else:
             players = []  # [...manually defined list...]
             # Example:
-            fasttext_model = fasttext.load_model("models/2021_06_05_processed.model")
-            player = LocalFasttextPlayer(model=fasttext_model)
+            player = LocalDummyPlayer()
             players = [
-                PlayerDefinition('HerokuOrg team', RemotePlayer('https://obscure-everglades-02893.herokuapp.com')),
+                PlayerDefinition("HerokuOrg team", RemotePlayer("https://obscure-everglades-02893.herokuapp.com")),
                 # PlayerDefinition('Your trained remote player', RemotePlayer('http://35.246.139.13/')),
-                PlayerDefinition('Local Player', player)]
+                PlayerDefinition("Local Player", player),
+            ]
 
         # shuffle players
         np.random.shuffle(players)
@@ -84,6 +91,8 @@ if __name__ == "__main__":
         print(f"Game started at {game_start}. Game lasted for {game_end - game_start}")
 
         if GAME_SCOPE == "GLOBAL":
+            from server.data import upload_blob
+            from settings_server import BUCKET_LOGS
             upload_blob(BUCKET_LOGS, logfile, str(Path(logfile).name))
 
         logger.removeHandler(single_handler)

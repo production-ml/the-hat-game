@@ -12,7 +12,7 @@ from nltk.stem.snowball import SnowballStemmer
 
 import the_hat_game.nltk_setup  # noqa: F401
 from the_hat_game.loggers import c_handler, logger
-from the_hat_game.players import RemotePlayer
+from flask_app.player import RemotePlayer
 
 
 class Game:
@@ -141,15 +141,15 @@ class Game:
         for player in guessing_players:
             player_results = {}
             player_dict = players_guesses[player.name]
-            guessed_words = player_dict['word_list']
+            guessed_words = player_dict["word_list"]
             guessed = self.check_criteria(word, guessed_words)
             logger.info(f"GUESSING PLAYER ({player.name}) to HOST: {guessed_words}")
             # logger.info(f"RESPONSE_TIME: {player_dict['time']}, RESPONSE_CODE: {player_dict['code']}")
             logger.info(f"HOST: {guessed}")
             game_round.update({f"Guess ({player.name})": guessed_words})
             player_results["guessed"] = guessed
-            player_results["response_time"] = player_dict['time']
-            player_results["response_200"] = player_dict['code'] == 200
+            player_results["response_time"] = player_dict["time"]
+            player_results["response_200"] = player_dict["code"] == 200
             results[player.name] = player_results
         return game_round, results
 
@@ -180,7 +180,9 @@ class Game:
                 player_results = results_round.get(player.name, dict())
                 for metric in player_results.keys():
                     if metric != "guessed":
-                        metrics[(player.name, metric)] = metrics.get((player.name, metric), list()) + [player_results[metric]]
+                        metrics[(player.name, metric)] = metrics.get((player.name, metric), list()) + [
+                            player_results[metric]
+                        ]
             for player in guessing_players[:]:
                 if (player.name not in success_rounds) and results_round.get(player.name, dict()).get("guessed", False):
                     success_rounds[player.name] = iround

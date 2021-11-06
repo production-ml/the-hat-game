@@ -3,15 +3,11 @@ from __future__ import print_function
 import os
 
 import pandas as pd
-
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-from the_hat_game.players import PlayerDefinition, RemotePlayer
-from settings_server import (
-    SCOPES, SAMPLE_SPREADSHEET_ID,
-    SAMPLE_RANGE_NAME, TOKEN_PATH,
-    COLUMN_TEAM, COLUMN_IP)
+from settings_server import COLUMN_IP, COLUMN_TEAM, SAMPLE_RANGE_NAME, SAMPLE_SPREADSHEET_ID, SCOPES, TOKEN_PATH
+from flask_app.player import PlayerDefinition, RemotePlayer
 
 
 def get_global_players():
@@ -25,8 +21,5 @@ def get_global_players():
 
         df = pd.DataFrame(values[1:], columns=values[0])
 
-        players = [
-            PlayerDefinition(row[COLUMN_TEAM], RemotePlayer(row[COLUMN_IP]))
-            for i, row in df.iterrows()
-        ]
+        players = [PlayerDefinition(row[COLUMN_TEAM], RemotePlayer(row[COLUMN_IP])) for i, row in df.iterrows()]
         return players

@@ -2,8 +2,6 @@ import logging
 
 import pandas as pd
 
-# from server.data import upload_blob
-# from settings import BUCKET_LOGS
 
 common_log_filename = "logs/game_run.log"
 current_log_filename = "logs/game run {}.log".format(pd.Timestamp.now().strftime("%Y-%m-%d %H_%M_%S"))

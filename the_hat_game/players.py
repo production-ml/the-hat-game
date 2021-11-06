@@ -9,6 +9,7 @@ HIDE_WARNINGS = True
 
 PlayerDefinition = namedtuple("PlayerDefinition", ["name", "api"])
 
+
 def validate_word_list(word_list):
     if not isinstance(word_list, list):
         return False
@@ -20,6 +21,7 @@ def validate_word_list(word_list):
 
 class ValidationError(Exception):
     pass
+
 
 class AbstractPlayer:
     def __init__(self):
@@ -98,5 +100,5 @@ class LocalFasttextPlayer(AbstractPlayer):
         return self.find_words_for_sentence(word, n_words)
 
     def guess(self, words, n_words):
-        words_for_sentence = self.find_words_for_sentence(' '.join(words), n_words)
+        words_for_sentence = self.find_words_for_sentence(" ".join(words), n_words)
         return {"word_list": words_for_sentence, "time": 0, "code": 200}

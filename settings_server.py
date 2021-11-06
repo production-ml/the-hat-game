@@ -2,18 +2,18 @@
 
 import os
 from pathlib import Path
+
 from server.storage import get_storage
 from the_hat_game.utils import get_project_root
 
-
 CWD = Path(os.getcwd())
 DATA_PATH = CWD / "texts"
+GLOBAL_VOCAB_PATH = CWD / "vocab" / "vocab.txt"
 PROJECT_GCS_ID = "mlops-dvc-demo"
 BUCKET_SPLIT_TEXTS = "dmia-mlops-texts-vault"
 BUCKET_LOGS = "dmia-mlops-logs"
 BUCKET_DAILY = "dmia-mlops-texts"
-GAME_SCOPE = "LOCAL"  # Could be "GLOBAL" or "LOCAL"
-STORAGE_CLIENT = get_storage(GAME_SCOPE, PROJECT_GCS_ID)
+STORAGE_CLIENT = get_storage(PROJECT_GCS_ID)
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]

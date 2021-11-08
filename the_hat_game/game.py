@@ -12,7 +12,7 @@ from nltk.stem.snowball import SnowballStemmer
 
 import the_hat_game.nltk_setup  # noqa: F401
 from the_hat_game.loggers import c_handler, logger
-from flask_app.player import RemotePlayer
+from the_hat_game.players import RemotePlayer
 
 
 class Game:

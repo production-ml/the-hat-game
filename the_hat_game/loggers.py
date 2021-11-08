@@ -2,7 +2,6 @@ import logging
 
 import pandas as pd
 
-
 common_log_filename = "logs/game_run.log"
 current_log_filename = "logs/game run {}.log".format(pd.Timestamp.now().strftime("%Y-%m-%d %H_%M_%S"))
 

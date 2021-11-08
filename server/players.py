@@ -7,7 +7,7 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
 from settings_server import COLUMN_IP, COLUMN_TEAM, SAMPLE_RANGE_NAME, SAMPLE_SPREADSHEET_ID, SCOPES, TOKEN_PATH
-from flask_app.player import PlayerDefinition, RemotePlayer
+from the_hat_game.players import PlayerDefinition, RemotePlayer
 
 
 def get_global_players():

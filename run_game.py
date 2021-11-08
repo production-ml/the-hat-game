@@ -8,16 +8,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from flask_app.player import (
-    LocalDummyPlayer,
-    LocalFasttextPlayer,
-    PlayerDefinition,
-    RemotePlayer)
+from flask_app.player import LocalDummyPlayer, LocalFasttextPlayer  # noqa: F401
 from settings import CRITERIA, GAME_SCOPE, N_EXPLAIN_WORDS, N_GUESSING_WORDS
 from the_hat_game.game import Game
 from the_hat_game.loggers import logger
+from the_hat_game.players import PlayerDefinition, RemotePlayer
 
-if GAME_SCOPE == 'GLOBAL':
+if GAME_SCOPE == "GLOBAL":
     from settings_server import GLOBAL_VOCAB_PATH as VOCAB_PATH
 else:
     from settings import LOCAL_VOCAB_PATH as VOCAB_PATH
@@ -93,6 +90,7 @@ if __name__ == "__main__":
         if GAME_SCOPE == "GLOBAL":
             from server.data import upload_blob
             from settings_server import BUCKET_LOGS
+
             upload_blob(BUCKET_LOGS, logfile, str(Path(logfile).name))
 
         logger.removeHandler(single_handler)

@@ -9,6 +9,7 @@ HIDE_WARNINGS = True
 
 PlayerDefinition = namedtuple("PlayerDefinition", ["name", "api"])
 
+
 def validate_word_list(word_list):
     if not isinstance(word_list, list):
         return False
@@ -20,6 +21,7 @@ def validate_word_list(word_list):
 
 class ValidationError(Exception):
     pass
+
 
 class AbstractPlayer:
     def __init__(self):

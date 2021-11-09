@@ -8,12 +8,17 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from data.utils import upload_blob
-from settings import BUCKET_LOGS, CRITERIA, N_EXPLAIN_WORDS, N_GUESSING_WORDS, VOCAB_PATH
+from flask_app.player import LocalDummyPlayer, LocalFasttextPlayer  # noqa: F401
+from settings import CRITERIA, GAME_SCOPE, N_EXPLAIN_WORDS, N_GUESSING_WORDS
 from the_hat_game.game import Game
-from the_hat_game.google import get_players
 from the_hat_game.loggers import logger
 from the_hat_game.players import PlayerDefinition, RemotePlayer
+
+if GAME_SCOPE == "GLOBAL":
+    from settings_server import GLOBAL_VOCAB_PATH as VOCAB_PATH
+else:
+    from settings import LOCAL_VOCAB_PATH as VOCAB_PATH
+
 
 if __name__ == "__main__":
 
@@ -48,12 +53,19 @@ if __name__ == "__main__":
             WORDS.extend(words)
         print(f"Words we will use for the game: {sorted(WORDS)[:10]}")
 
-        data = get_players()
+        if GAME_SCOPE == "GLOBAL":
+            from server.players import get_global_players
 
-        players = [
-            PlayerDefinition(row["Team name"], RemotePlayer(row["Team IP or URL (with port if necessary)"]))
-            for i, row in data.iterrows()
-        ]
+            players = get_global_players()
+        else:
+            players = []  # [...manually defined list...]
+            # Example:
+            player = LocalDummyPlayer()
+            players = [
+                PlayerDefinition("HerokuOrg team", RemotePlayer("https://obscure-everglades-02893.herokuapp.com")),
+                # PlayerDefinition('Your trained remote player', RemotePlayer('http://35.246.139.13/')),
+                PlayerDefinition("Local Player", player),
+            ]
 
         # shuffle players
         np.random.shuffle(players)
@@ -75,7 +87,11 @@ if __name__ == "__main__":
         game.report_results()
         print(f"Game started at {game_start}. Game lasted for {game_end - game_start}")
 
-        upload_blob(BUCKET_LOGS, logfile, str(Path(logfile).name))
+        if GAME_SCOPE == "GLOBAL":
+            from server.data import upload_blob
+            from settings_server import BUCKET_LOGS
+
+            upload_blob(BUCKET_LOGS, logfile, str(Path(logfile).name))
 
         logger.removeHandler(single_handler)
 

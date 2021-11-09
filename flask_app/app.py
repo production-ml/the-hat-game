@@ -3,7 +3,6 @@ import os
 import random
 
 from flask import Flask, render_template, request
-
 from player import LocalDummyPlayer
 
 app = Flask(__name__)

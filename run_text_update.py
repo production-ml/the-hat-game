@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from time import sleep
 
-from data.utils import add_new_text
+from server.data import add_new_text
 
 
 def main():

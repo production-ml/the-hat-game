@@ -1,39 +1,12 @@
+"""Settings for the Hat Game."""
+
 import os
 from pathlib import Path
 
-
 CWD = Path(os.getcwd())
-DATA_PATH = CWD / "texts"
-PROJECT_GCS_ID = "mlops-dvc-demo"
-BUCKET_SPLIT_TEXTS = "dmia-mlops-texts-vault"
-BUCKET_LOGS = "dmia-mlops-logs"
-BUCKET_DAILY = "dmia-mlops-texts"
-VOCAB_PATH = CWD / "vocab" / "vocab.txt"
-
-try:
-    from google.cloud import storage
-    STORAGE_CLIENT = storage.Client(project=PROJECT_GCS_ID)
-except:
-    pass
-
-HIDE_WARNINGS = False
-
+GAME_SCOPE = "LOCAL"  # Could be "GLOBAL" or "LOCAL"
+LOCAL_VOCAB_PATH = CWD / "text_samples" / "nouns_top_50.txt"
 N_EXPLAIN_WORDS = 10
 N_GUESSING_WORDS = 5
 N_ROUNDS = 1
 CRITERIA = "soft"
-
-SCOPE = [
-    "https://spreadsheets.google.com/feeds",
-    "https://www.googleapis.com/auth/drive",
-]
-
-
-SPREADSHEET = "2019-12 DMIA Hat (Responses)"
-
-
-def set_environ():
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(CWD / "credentials" / "bucket_storage.json")
-
-
-set_environ()

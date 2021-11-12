@@ -1,9 +1,3 @@
-# import fasttext
-import numpy as np
-import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
-
-
 class AbstractPlayer:
     def __init__(self):
         raise NotImplementedError()
@@ -15,23 +9,29 @@ class AbstractPlayer:
         raise NotImplementedError()
 
 
+class LocalDummyPlayer(AbstractPlayer):
+    def __init__(self):
+        pass
+
+    def explain(self, word, n_words):
+        return "Hi! My name is LocalDummyPlayer! What's yours?".split()[:n_words]
+
+    def guess(self, words, n_words):
+        return "I guess it's a word, but don't have any idea which one!".split()[:n_words]
+
+
 class LocalFasttextPlayer(AbstractPlayer):
     def __init__(self, model):
         self.model = model
-        self.words = model.get_words()
-        self.matrix = np.concatenate([model[word].reshape(1, -1) for word in self.words], axis=0)
-
-    def find_words_for_vector(self, vector, n_closest):
-        sims = cosine_similarity(vector.reshape(1, -1), self.matrix).ravel()
-        word_sims = pd.Series(sims, index=self.model.get_words()).sort_values(ascending=False)
-        return list(word_sims.head(n_closest).index)
 
     def find_words_for_sentence(self, sentence, n_closest):
-        vector = self.model.get_sentence_vector(sentence)
-        return self.find_words_for_vector(vector, n_closest)
+        neighbours = self.model.get_nearest_neighbors(sentence)
+        words = [word for similariry, word in neighbours][:n_closest]
+        return words
 
     def explain(self, word, n_words):
         return self.find_words_for_sentence(word, n_words)
 
     def guess(self, words, n_words):
-        return self.find_words_for_sentence(" ".join(words), n_words)
+        words_for_sentence = self.find_words_for_sentence(" ".join(words), n_words)
+        return words_for_sentence

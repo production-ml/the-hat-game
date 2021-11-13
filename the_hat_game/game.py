@@ -141,6 +141,9 @@ class Game:
         for player in guessing_players:
             player_results = {}
             player_dict = players_guesses[player.name]
+            # local players may return just list. This quick fix allows that
+            if isinstance(player_dict, list):
+                player_dict = dict(word_list=player_dict)
             guessed_words = player_dict["word_list"]
             guessed = self.check_criteria(word, guessed_words)
             logger.info(f"GUESSING PLAYER ({player.name}) to HOST: {guessed_words}")
@@ -148,8 +151,8 @@ class Game:
             logger.info(f"HOST: {guessed}")
             game_round.update({f"Guess ({player.name})": guessed_words})
             player_results["guessed"] = guessed
-            player_results["response_time"] = player_dict["time"]
-            player_results["response_200"] = player_dict["code"] == 200
+            player_results["response_time"] = player_dict.get("time", np.nan)
+            player_results["response_200"] = player_dict.get("code", None) == 200
             results[player.name] = player_results
         return game_round, results
 

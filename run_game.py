@@ -96,5 +96,8 @@ if __name__ == "__main__":
         logger.removeHandler(single_handler)
 
         os.remove(logfile)
-
-        time.sleep(15 * 60)
+        
+        if GAME_SCOPE == "GLOBAL":
+            time.sleep(15 * 60)
+        else:
+            break

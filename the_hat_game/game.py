@@ -28,6 +28,10 @@ class Game:
     ):
         assert len(players) >= 2
         assert criteria in ("hard", "soft")
+        assert n_rounds <= len(words) // len(players), (
+            f"For {n_rounds} rounds and {len(players)} players"
+            "you need at least {n_rounds * len(players)} words, but you have only {len(words)}"
+        )
         self.players = players
         self.words = words
         self.criteria = criteria
@@ -44,8 +48,8 @@ class Game:
                 unique_words.append(c)
         return unique_words
 
-    def score_players(self, explainer_name, last_rounds):
-        rewards = {player: self.n_explain_words + 1 - nround for player, nround in last_rounds.items()}
+    def score_players(self, explainer_name, last_tries):
+        rewards = {player: self.n_explain_words + 1 - try_number for player, try_number in last_tries.items()}
         rewards[explainer_name] = sum(rewards.values())
         return rewards
 
@@ -121,11 +125,11 @@ class Game:
             )
         return players_guesses
 
-    def play_round(self, explaining_player, guessing_players, word, sentence):
-        game_round = OrderedDict()
+    def play_try(self, explaining_player, guessing_players, word, sentence):
+        game_try = OrderedDict()
         results = {}
         logger.info(f"HOST: {sentence}")
-        game_round.update({f'Explanation for "{word}" ({explaining_player.name})': sentence})
+        game_try.update({f'Explanation for "{word}" ({explaining_player.name})': sentence})
 
         # if False:
         #     for player in guessing_players:
@@ -149,14 +153,14 @@ class Game:
             logger.info(f"GUESSING PLAYER ({player.name}) to HOST: {guessed_words}")
             # logger.info(f"RESPONSE_TIME: {player_dict['time']}, RESPONSE_CODE: {player_dict['code']}")
             logger.info(f"HOST: {guessed}")
-            game_round.update({f"Guess ({player.name})": guessed_words})
+            game_try.update({f"Guess ({player.name})": guessed_words})
             player_results["guessed"] = guessed
             player_results["response_time"] = player_dict.get("time", np.nan)
             player_results["response_200"] = player_dict.get("code", None) == 200
             results[player.name] = player_results
-        return game_round, results
+        return game_try, results
 
-    def play(self, explaining_player, guessing_players, word, criteria):
+    def play_iteration(self, explaining_player, guessing_players, word, criteria):
 
         logger.info(f'HOST to EXPLAINING PLAYER ({explaining_player.name}): the word is "{word}"')
 
@@ -167,17 +171,17 @@ class Game:
         )
 
         df = []
-        success_rounds = {}
+        success_tries = {}
         metrics = {}
-        for iround in range(1, len(guessing_by) + 1):
+        for i in range(1, len(guessing_by) + 1):
             if len(guessing_players) == 0:
                 break
-            logger.info(f"\n===ROUND {iround}===\n")
-            game_round, results_round = self.play_round(
+            logger.info(f"\n===TRY {i}===\n")
+            game_round, results_round = self.play_try(
                 explaining_player=explaining_player,
                 guessing_players=guessing_players,
                 word=word,
-                sentence=guessing_by[:iround],
+                sentence=guessing_by[:i],
             )
             for player in [explaining_player] + guessing_players:
                 player_results = results_round.get(player.name, dict())
@@ -187,12 +191,12 @@ class Game:
                             player_results[metric]
                         ]
             for player in guessing_players[:]:
-                if (player.name not in success_rounds) and results_round.get(player.name, dict()).get("guessed", False):
-                    success_rounds[player.name] = iround
+                if (player.name not in success_tries) and results_round.get(player.name, dict()).get("guessed", False):
+                    success_tries[player.name] = i
                     guessing_players = [p for p in guessing_players if p != player]
             df.append(game_round)
         df = pd.DataFrame(df)
-        scores = self.score_players(explaining_player.name, success_rounds)
+        scores = self.score_players(explaining_player.name, success_tries)
         for key in metrics:
             metrics[key] = np.mean(metrics[key])
 
@@ -233,7 +237,7 @@ class Game:
         scores = []
         scores_status = defaultdict(int)
         metrics = []
-        for r in range(self.run_rounds):
+        for _ in range(self.run_rounds):
             players = self.players[:]
             # shuffle players to average randomness with some players' services
             # breaking at some point and taking time to get back up
@@ -243,8 +247,11 @@ class Game:
                 try:
                     word = self.run_words[igame]
                 except IndexError:
+                    logger.info("HOST: No words left in the hat. Ending the game.")
                     break
-                df, score, metric = self.play(explaining_player, guessing_players, word, criteria=self.criteria)
+                df, score, metric = self.play_iteration(
+                    explaining_player, guessing_players, word, criteria=self.criteria
+                )
                 scores.append(score)
                 scores_status[(explaining_player.name, "explaining")] += score.get(explaining_player.name, 0)
                 metrics.append(metric)

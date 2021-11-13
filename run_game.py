@@ -78,7 +78,13 @@ if __name__ == "__main__":
         # play the hat game
         print("\n\nStarting the new game")
         game = Game(
-            players, words_in_hat, CRITERIA, len(words_in_hat), N_EXPLAIN_WORDS, N_GUESSING_WORDS, random_state=0
+            players,
+            words_in_hat,
+            CRITERIA,
+            n_rounds=len(words_in_hat) // len(players),
+            n_explain_words=N_EXPLAIN_WORDS,
+            n_guessing_words=N_GUESSING_WORDS,
+            random_state=0,
         )
 
         game_start = pd.Timestamp.now()
@@ -96,7 +102,7 @@ if __name__ == "__main__":
         logger.removeHandler(single_handler)
 
         os.remove(logfile)
-        
+
         if GAME_SCOPE == "GLOBAL":
             time.sleep(15 * 60)
         else:

@@ -1,4 +1,4 @@
 import nltk
 
-nltk.download("wordnet")
-nltk.download("punkt")
+nltk.download("wordnet", quiet=True)
+nltk.download("punkt", quiet=True)

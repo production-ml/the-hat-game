@@ -29,8 +29,7 @@ isort = {extras = ["pipfile"],version = "*"}
 black = "*"
 autoflake = "*"
 flake8 = "*"
-pre-commit-dummy-package = {editable = true, git = "https://github.com/pre-commit/mirrors-mypy.git"}
-pre-commit = "*"
+ipykernel = "*"
 
 [requires]
 python_version = "3.8"

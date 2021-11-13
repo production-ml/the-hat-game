@@ -58,13 +58,11 @@ if __name__ == "__main__":
 
             players = get_global_players()
         else:
-            players = []  # [...manually defined list...]
-            # Example:
-            player = LocalDummyPlayer()
+            # define player list manually. Example:
             players = [
-                PlayerDefinition("HerokuOrg team", RemotePlayer("https://obscure-everglades-02893.herokuapp.com")),
-                # PlayerDefinition('Your trained remote player', RemotePlayer('http://35.246.139.13/')),
-                PlayerDefinition("Local Player", player),
+                PlayerDefinition("HerokuOrg", RemotePlayer("https://obscure-everglades-02893.herokuapp.com")),
+                PlayerDefinition("Local Dummy Junior", LocalDummyPlayer()),
+                PlayerDefinition("Local Dummy Senior", LocalDummyPlayer()),
             ]
 
         # shuffle players

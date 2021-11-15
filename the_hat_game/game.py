@@ -3,6 +3,7 @@ import logging
 import multiprocessing as mp
 import re
 from collections import defaultdict
+from datetime import datetime
 from typing import OrderedDict
 
 import numpy as np
@@ -17,8 +18,8 @@ from the_hat_game.loggers import c_handler, logger
 from the_hat_game.players import RemotePlayer
 
 
-def send_data(data, filename):
-    with open(filename, "w") as f:
+def dump_locally(data, name):
+    with open(f"{name}.json", "w") as f:
         f.write(json.dumps(data))
         f.write("\n")
 
@@ -33,6 +34,7 @@ class Game:
         n_explain_words,
         n_guessing_words,
         random_state=None,
+        logging_callback=dump_locally,
     ):
         assert len(players) >= 2
         assert criteria in ("hard", "soft")
@@ -47,9 +49,10 @@ class Game:
         self.n_explain_words = n_explain_words
         self.n_guessing_words = n_guessing_words
         self.random_state = random_state
+        self.logging_callback = logging_callback
         self.stemmer = SnowballStemmer("english")
-        self._id = ...
         self.game_info = OrderedDict(
+            timestamp=datetime.utcnow().isoformat(),
             players=[p.name for p in players],
             words=words,
             criteria=criteria,
@@ -172,7 +175,7 @@ class Game:
             word=word,
             reported_words=reported_words,
             guessing_by=guessing_by,
-            attempts=[],
+            attempts={},
         )
         for i in range(1, len(guessing_by) + 1):
             if len(guessing_players) == 0:
@@ -196,9 +199,9 @@ class Game:
                 ):
                     success_attempts[player.name] = i
                     guessing_players = [p for p in guessing_players if p != player]
-            iteration_info["attempts"].append(attempt_info)
+            iteration_info["attempts"][f"attempt_{i}"] = attempt_info
             df.append(attempt_info)
-        send_data(iteration_info, "iteration.json")
+        self.logging_callback(iteration_info, "iteration")
         df = pd.DataFrame(df)
         scores = self.score_players(explaining_player.name, success_attempts)
         for key in metrics:
@@ -241,8 +244,8 @@ class Game:
         scores = []
         scores_status = defaultdict(int)
         metrics = []
-        self.game_info["iterations"] = []
-        for _ in range(self.run_rounds):
+        self.game_info["iterations"] = OrderedDict()
+        for r in range(self.run_rounds):
             players = self.players[:]
             # shuffle players to average randomness with some players' services
             # breaking at some point and taking time to get back up
@@ -255,7 +258,7 @@ class Game:
                     logger.info("HOST: No words left in the hat. Ending the game.")
                     break
                 df, score, metric, iteration_info = self.play_iteration(explaining_player, guessing_players, word)
-                self.game_info["iterations"].append(iteration_info)
+                self.game_info["iterations"][f"round_{r}"] = iteration_info
                 scores.append(score)
                 scores_status[(explaining_player.name, "explaining")] += score.get(explaining_player.name, 0)
                 metrics.append(metric)
@@ -266,7 +269,10 @@ class Game:
                 if verbose:
                     display(df)
 
-        send_data(self.game_info, "game.json")
+        try:
+            self.logging_callback(self.game_info, "game")
+        except:  # noqa: E722
+            pass
         self.scores = pd.DataFrame(scores).fillna(0)
         self.scores.index.name = "game"
 

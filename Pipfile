@@ -30,6 +30,7 @@ black = "*"
 autoflake = "*"
 flake8 = "*"
 ipykernel = "*"
+google-cloud-bigquery = "*"
 
 [requires]
 python_version = "3.8"

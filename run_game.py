@@ -20,6 +20,15 @@ else:
     from settings import LOCAL_VOCAB_PATH as VOCAB_PATH
 
 
+def first_locally_then_to_bigquery(payload, name):
+    # TODO: use dump_locally for local runs
+    from server.data_bigquery import upload_to_bigquery_table
+    from the_hat_game.game import dump_locally
+
+    dump_locally(payload, name)
+    upload_to_bigquery_table(payload, name)
+
+
 if __name__ == "__main__":
 
     # # read all words
@@ -83,6 +92,7 @@ if __name__ == "__main__":
             n_explain_words=N_EXPLAIN_WORDS,
             n_guessing_words=N_GUESSING_WORDS,
             random_state=0,
+            logging_callback=first_locally_then_to_bigquery,
         )
 
         game_start = pd.Timestamp.now()

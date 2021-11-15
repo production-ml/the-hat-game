@@ -8,6 +8,7 @@ from collections import Counter
 from glob import glob
 from typing import List
 
+import nltk
 from google.cloud import storage
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
@@ -18,6 +19,7 @@ from settings_server import BUCKET_DAILY, BUCKET_SPLIT_TEXTS, DATA_PATH
 from settings_server import GLOBAL_VOCAB_PATH as VOCAB_PATH
 from settings_server import STORAGE_CLIENT
 
+nltk.download("stopwords", quiet=True)
 STOP_WORDS = stopwords.words("english")
 LEMMATIZER = WordNetLemmatizer()
 

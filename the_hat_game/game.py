@@ -32,7 +32,7 @@ class Game:
         """Main class for Game.
         params:
             - players: list of AbstractPlayer - players in the game
-            - words: list of str - all used words in the game
+            - words: list of str - all used words for guessing
             - criteria: 'hard' of 'soft' - game criteria
             - n_rounds: int - number of rounds
             - n_explain_words: int - number of words for explaining
@@ -54,13 +54,19 @@ class Game:
         self.stemmer = SnowballStemmer("english")
         if corpus_path is not None:
             assert vocab_path is None, "corpus and vocabulary cannot be defined at the same time"
-            self.used_words = corpus_to_words(corpus_path)
+            self.whitelist = corpus_to_words(corpus_path)
         elif vocab_path is not None:
             with open(vocab_path, encoding="utf-8") as f:
-                words = f.readlines()
-                self.used_words = [word.strip() for word in words]
+                vocab_words = f.readlines()
+                self.whitelist = [word.strip() for word in vocab_words]
         else:
-            self.used_words = None
+            self.whitelist = None
+        # add all words for guessing to non-empty whitelist
+        if self.whitelist is not None:
+            self.whitelist += [
+                word for word in self.words
+                if word not in self.whitelist
+            ]
 
     def remove_repeated_words(self, words):
         unique_words = []
@@ -80,8 +86,8 @@ class Game:
         return cleared_word_list
 
     def remove_non_existing_words(self, words):
-        if self.used_words is not None:
-            existing_words = [w for w in words if w in self.used_words]
+        if self.whitelist is not None:
+            existing_words = [w for w in words if w in self.whitelist]
         else:
             existing_words = [w for w in words if len(wordnet.synsets(w)) > 0]
         return existing_words

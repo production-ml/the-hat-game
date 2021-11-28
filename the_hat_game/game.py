@@ -13,7 +13,7 @@ from nltk.stem.snowball import SnowballStemmer
 import the_hat_game.nltk_setup  # noqa: F401
 from the_hat_game.loggers import c_handler, logger
 from the_hat_game.players import RemotePlayer
-from data.utils import corpus_to_words
+from the_hat_game.data import corpus_to_words
 
 
 class Game:

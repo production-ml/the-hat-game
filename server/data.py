@@ -30,7 +30,7 @@ def sent_2_words(sent: str) -> List[str]:
     return words
 
 
-def corpus_to_words(file_path: str, vocab_path: str = str(VOCAB_PATH)):
+def corpus_to_words(file_path: str):
     my_counter: Counter = Counter()
     with open(file_path, "r", encoding="utf-8") as fl:
         for sent in tqdm(fl, desc="Precess file"):
@@ -40,7 +40,10 @@ def corpus_to_words(file_path: str, vocab_path: str = str(VOCAB_PATH)):
     min_count = max([10, max_cnt / 100])
 
     selected_words = [word for word, count in my_counter.items() if (min_count < count <= max_cnt)]
+    return selected_words
 
+
+def save_words(selected_words, vocab_path: str = str(VOCAB_PATH)):
     with open(vocab_path, "w", encoding="utf-8") as fl:
         for w in selected_words:
             fl.write(w + "\n")
@@ -179,7 +182,8 @@ def add_new_text(bucket_name=BUCKET_SPLIT_TEXTS, destination_bucket_name=BUCKET_
     to_copy = sorted(set(all_files) - set(copied_files))[0]
     print(to_copy)
     download_blob(bucket_name, to_copy, DATA_PATH / to_copy)
-    corpus_to_words(DATA_PATH / to_copy)
+    words = corpus_to_words(DATA_PATH / to_copy)
+    save_words(words)
     copy_blob(bucket_name, to_copy, destination_bucket_name, to_copy)
 
 

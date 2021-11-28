@@ -13,6 +13,7 @@ from nltk.stem.snowball import SnowballStemmer
 import the_hat_game.nltk_setup  # noqa: F401
 from the_hat_game.loggers import c_handler, logger
 from the_hat_game.players import RemotePlayer
+from the_hat_game.data import corpus_to_words
 
 
 class Game:
@@ -24,8 +25,23 @@ class Game:
         n_rounds,
         n_explain_words,
         n_guessing_words,
+        corpus_path=None,
+        vocab_path=None,
         random_state=None,
     ):
+        """Main class for Game.
+        params:
+            - players: list of AbstractPlayer - players in the game
+            - words: list of str - all used words for guessing
+            - criteria: 'hard' of 'soft' - game criteria
+            - n_rounds: int - number of rounds
+            - n_explain_words: int - number of words for explaining
+            - n_guessing_words: int - number of words for guessing
+            - corpus_path: str - path for the corpus to create vocabulary (for criteria='hard')
+            - vocab_path: str - path for vocabulary (for criteria='hard')
+            NOTE: only corpus_path or vocab_path must be defined
+            NOTE: if vocabulary is not defined nltk.wordnet will be used for filter not existing words
+        """
         assert len(players) >= 2
         assert criteria in ("hard", "soft")
         self.players = players
@@ -36,6 +52,21 @@ class Game:
         self.n_guessing_words = n_guessing_words
         self.random_state = random_state
         self.stemmer = SnowballStemmer("english")
+        if corpus_path is not None:
+            assert vocab_path is None, "corpus and vocabulary cannot be defined at the same time"
+            self.whitelist = corpus_to_words(corpus_path)
+        elif vocab_path is not None:
+            with open(vocab_path, encoding="utf-8") as f:
+                vocab_words = f.readlines()
+                self.whitelist = [word.strip() for word in vocab_words]
+        else:
+            self.whitelist = None
+        # add all words for guessing to non-empty whitelist
+        if self.whitelist is not None:
+            self.whitelist += [
+                word for word in self.words
+                if word not in self.whitelist
+            ]
 
     def remove_repeated_words(self, words):
         unique_words = []
@@ -54,9 +85,11 @@ class Game:
         cleared_word_list = [w for w in word_list if self.stemmer.stem(w) != root]
         return cleared_word_list
 
-    @staticmethod
-    def remove_non_existing_words(words):
-        existing_words = [w for w in words if len(wordnet.synsets(w)) > 0]
+    def remove_non_existing_words(self, words):
+        if self.whitelist is not None:
+            existing_words = [w for w in words if w in self.whitelist]
+        else:
+            existing_words = [w for w in words if len(wordnet.synsets(w)) > 0]
         return existing_words
 
     def create_word_list(self, player, word, n_words):

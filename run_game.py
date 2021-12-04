@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import random
@@ -20,13 +21,16 @@ else:
     from settings import LOCAL_VOCAB_PATH as VOCAB_PATH
 
 
-def first_locally_then_to_bigquery(payload, name):
-    # TODO: use dump_locally for local runs
-    from server.data_bigquery import upload_to_bigquery_table
+def upload_callback(payload, name):
     from the_hat_game.game import dump_locally
 
     dump_locally(payload, name)
-    upload_to_bigquery_table(payload, name)
+    if GAME_SCOPE != "LOCAL":
+        from server.mongo import upload
+
+        if GAME_SCOPE == "TEST":
+            name = "test_" + name
+        upload(payload, name)
 
 
 if __name__ == "__main__":
@@ -66,7 +70,12 @@ if __name__ == "__main__":
             from server.players import get_global_players
 
             players = get_global_players()
-        else:
+        elif GAME_SCOPE == "TEST":
+            players = []
+            with open("players.json") as f:
+                for p, u in json.load(f).items():
+                    players.append(PlayerDefinition(p, RemotePlayer(u)))
+        elif GAME_SCOPE == "LOCAL":
             # define player list manually. Example:
             players = [
                 PlayerDefinition("HerokuOrg", RemotePlayer("https://obscure-everglades-02893.herokuapp.com")),
@@ -79,7 +88,7 @@ if __name__ == "__main__":
 
         # put one word for each team in a hat
         # np.random.shuffle(WORDS)
-        words_in_hat = random.choices(WORDS, k=len(players))
+        words_in_hat = random.choices(WORDS, k=len(players) * 1)
         print(f"Words in hat: {words_in_hat}")
 
         # play the hat game
@@ -92,7 +101,7 @@ if __name__ == "__main__":
             n_explain_words=N_EXPLAIN_WORDS,
             n_guessing_words=N_GUESSING_WORDS,
             random_state=0,
-            logging_callback=first_locally_then_to_bigquery,
+            logging_callback=upload_callback,
         )
 
         game_start = pd.Timestamp.now()

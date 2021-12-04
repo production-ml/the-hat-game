@@ -1,7 +1,7 @@
-import json
 import logging
 import multiprocessing as mp
 import re
+import traceback
 from collections import defaultdict
 from datetime import datetime
 from typing import OrderedDict
@@ -14,14 +14,8 @@ from nltk.metrics.distance import edit_distance
 from nltk.stem.snowball import SnowballStemmer
 
 import the_hat_game.nltk_setup  # noqa: F401
-from the_hat_game.loggers import c_handler, logger
+from the_hat_game.loggers import c_handler, dump_locally, logger
 from the_hat_game.players import RemotePlayer
-
-
-def dump_locally(data, name):
-    with open(f"{name}.json", "w") as f:
-        f.write(json.dumps(data))
-        f.write("\n")
 
 
 class Game:
@@ -52,8 +46,8 @@ class Game:
         self.logging_callback = logging_callback
         self.stemmer = SnowballStemmer("english")
         self.game_info = OrderedDict(
-            timestamp=datetime.utcnow().isoformat(),
-            players=[p.name for p in players],
+            timestamp=datetime.utcnow(),
+            players={p.name: p.api.url if isinstance(p.api, RemotePlayer) else None for p in players},
             words=words,
             criteria=criteria,
             n_rounds=n_rounds,
@@ -62,7 +56,9 @@ class Game:
         )
 
     def score_players(self, explainer_name, successfull_attempts):
-        rewards = {player: self.n_explain_words + 1 - attempt for player, attempt in successfull_attempts.items()}
+        rewards = {player.name: 0 for player in self.players}
+        for player, attempt in successfull_attempts.items():
+            rewards[player] += self.n_explain_words + 1 - attempt
         rewards[explainer_name] = sum(rewards.values())
         return rewards
 
@@ -73,6 +69,14 @@ class Game:
     @staticmethod
     def remove_non_existing_words(words):
         return [w for w in words if len(wordnet.synsets(w)) > 0]
+
+    @staticmethod
+    def remove_repeated_words(words):
+        unique_words = []
+        for c in words:
+            if c not in unique_words:
+                unique_words.append(c)
+        return unique_words
 
     def create_word_list(self, player, word, n_words):
         reported_words = player.explain(word, n_words)
@@ -87,7 +91,7 @@ class Game:
         # remove all words with too small levenstein distance from the word being explained
         explain_words = [w for w in explain_words if edit_distance(word, w) > 2]
         explain_words = [w for w in explain_words if w != ""]
-        explain_words = list(set(explain_words))
+        explain_words = self.remove_repeated_words(explain_words)
         if self.criteria == "hard":
             explain_words = self.remove_same_rooted_words(word, explain_words)
             explain_words = self.remove_non_existing_words(explain_words)
@@ -133,7 +137,6 @@ class Game:
         return players_guesses
 
     def play_attempt(self, guessing_players, word, sentence):
-        attempt_info = []
         results = {}
         logger.info(f"HOST: {sentence}")
 
@@ -149,12 +152,12 @@ class Game:
             guessed = self.check_criteria(word, guessed_words)
             logger.info(f"({str(guessed):5}) GUESSING PLAYER ({player.name}) to HOST: {guessed_words}")
             # logger.info(f"RESPONSE_TIME: {player_dict['time']}, RESPONSE_CODE: {player_dict['code']}")
-            attempt_info.append(dict(guesser_name=player.name, guesser_words=guessed_words))
+            player_results["words"] = guessed_words
             player_results["guessed"] = guessed
             player_results["response_time"] = player_dict.get("time", np.nan)
             player_results["response_200"] = player_dict.get("code", None) == 200
             results[player.name] = player_results
-        return attempt_info, results
+        return results
 
     def play_iteration(self, explaining_player, guessing_players, word):
 
@@ -168,46 +171,51 @@ class Game:
 
         df = []
         success_attempts = {}
-        metrics = {}
+        metrics = defaultdict(dict)
         iteration_info = OrderedDict(
+            timestamp=datetime.utcnow(),
             explaining_player=explaining_player.name,
             guessing_players=[p.name for p in guessing_players],
             word=word,
             reported_words=reported_words,
             guessing_by=guessing_by,
-            attempts={},
+            attempts=[],
         )
         for i in range(1, len(guessing_by) + 1):
             if len(guessing_players) == 0:
                 break
             logger.info(f"\n===ATTEMPT {i}===\n")
-            attempt_info, results_round = self.play_attempt(
+            results = self.play_attempt(
                 guessing_players=guessing_players,
                 word=word,
                 sentence=guessing_by[:i],
             )
             for player in [explaining_player] + guessing_players:
-                player_results = results_round.get(player.name, dict())
+                player_results = results.get(player.name, dict())
                 for metric in player_results.keys():
-                    if metric != "guessed":
-                        metrics[(player.name, metric)] = metrics.get((player.name, metric), list()) + [
+                    if metric not in ("guessed", "words"):
+                        metrics[player.name][metric] = metrics[player.name].get(metric, list()) + [
                             player_results[metric]
                         ]
+                        # metrics[(player.name, metric)] = metrics.get((player.name, metric), list()) + [
+                        #     player_results[metric]
+                        # ]
             for player in guessing_players[:]:
-                if (player.name not in success_attempts) and results_round.get(player.name, dict()).get(
-                    "guessed", False
-                ):
+                if (player.name not in success_attempts) and results.get(player.name, dict()).get("guessed", False):
                     success_attempts[player.name] = i
                     guessing_players = [p for p in guessing_players if p != player]
-            iteration_info["attempts"][f"attempt_{i}"] = attempt_info
-            df.append(attempt_info)
-        self.logging_callback(iteration_info, "iteration")
-        df = pd.DataFrame(df)
-        scores = self.score_players(explaining_player.name, success_attempts)
-        for key in metrics:
-            metrics[key] = np.mean(metrics[key])
+            iteration_info["attempts"].append(results)
+            df.append(results)
 
-        return df, scores, metrics, iteration_info
+        scores = self.score_players(explaining_player.name, success_attempts)
+        iteration_info["scores"] = scores
+        self.logging_callback({"game_timestamp": self.game_info["timestamp"], **iteration_info}, "iteration")
+        df = pd.DataFrame(df)
+        for p in metrics:
+            for m in metrics[p]:
+                metrics[p][m] = np.mean(metrics[p][m])
+        iteration_info["metrics"] = metrics
+        return df, scores, iteration_info
 
     def get_words(self, complete):
         if not complete:
@@ -243,8 +251,7 @@ class Game:
         igame = 0
         scores = []
         scores_status = defaultdict(int)
-        metrics = []
-        self.game_info["iterations"] = OrderedDict()
+        self.game_info["iterations"] = []
         for r in range(self.run_rounds):
             players = self.players[:]
             # shuffle players to average randomness with some players' services
@@ -257,11 +264,11 @@ class Game:
                 except IndexError:
                     logger.info("HOST: No words left in the hat. Ending the game.")
                     break
-                df, score, metric, iteration_info = self.play_iteration(explaining_player, guessing_players, word)
-                self.game_info["iterations"][f"round_{r}"] = iteration_info
+                df, score, iteration_info = self.play_iteration(explaining_player, guessing_players, word)
+                iteration_info["round"] = r
+                self.game_info["iterations"].append(iteration_info)
                 scores.append(score)
                 scores_status[(explaining_player.name, "explaining")] += score.get(explaining_player.name, 0)
-                metrics.append(metric)
                 for player in guessing_players:
                     scores_status[(player.name, "guessing")] += score.get(player.name, 0)
                 igame += 1
@@ -269,19 +276,18 @@ class Game:
                 if verbose:
                     display(df)
 
+        scores_dict = defaultdict(dict)
+        for (p, a), s in scores_status.items():
+            scores_dict[p][a] = s
+        self.game_info["scores"] = scores_dict
         try:
             self.logging_callback(self.game_info, "game")
         except:  # noqa: E722
-            pass
+            traceback.print_exc()
         self.scores = pd.DataFrame(scores).fillna(0)
         self.scores.index.name = "game"
 
         self.scores_status = pd.Series(scores_status).unstack()
-
-        metrics = pd.DataFrame(metrics)
-        metrics.index.name = "game"
-        metrics = metrics.mean(axis=0).to_dict()
-        self.metrics = pd.Series(metrics).unstack()
 
     def report_results(self, each_game=False):
         if each_game:
@@ -293,6 +299,6 @@ class Game:
         self.summary = self.scores_status
         self.summary["total"] = self.scores.sum(axis=0)
         self.summary.sort_values("total", ascending=False, inplace=True)
-        self.summary = pd.concat([self.summary, self.metrics], axis=1)
+        # self.summary = pd.concat([self.summary, self.metrics], axis=1)
         display(self.summary)
         logger.debug(self.summary)

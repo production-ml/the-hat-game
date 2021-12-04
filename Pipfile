@@ -22,6 +22,7 @@ google-auth-oauthlib = "*"
 flask = "*"
 jupyter = "*"
 prompt-toolkit = "*"
+pymongo = {extras = ["srv"], version = "*"}
 
 [dev-packages]
 jupyter = "*"

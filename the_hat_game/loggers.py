@@ -1,4 +1,7 @@
+import json
 import logging
+from copy import deepcopy
+from datetime import datetime
 
 import pandas as pd
 
@@ -25,3 +28,22 @@ logger.addHandler(c_handler)
 logger.addHandler(f_handler)
 
 logger.info("started logging")
+
+
+def serialize(data_to_serialize):
+    data = deepcopy(data_to_serialize)
+    if isinstance(data, (int, float, str, bool)):
+        return data
+    if isinstance(data, datetime):
+        return data.isoformat()
+    if isinstance(data, list):
+        return [serialize(i) for i in data]
+    if isinstance(data, dict):
+        return {key: serialize(value) for key, value in data.items()}
+    raise NotImplementedError
+
+
+def dump_locally(data, name):
+    with open(f"{name}.json", "w") as f:
+        f.write(json.dumps(serialize(data)))
+        f.write("\n")

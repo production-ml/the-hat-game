@@ -11,31 +11,20 @@ fasttext = "*"
 ipython = "*"
 nltk = "*"
 requests = "*"
-google-cloud = "==0.34.0"
-google-cloud-storage = "==1.36.2"
-oauth2client = "*"
-gspread = "*"
-google-spreadsheet = "*"
-google-api-python-client = "*"
-google-auth-httplib2 = "*"
-google-auth-oauthlib = "*"
 flask = "*"
 jupyter = "*"
-prompt-toolkit = "*"
-pymongo = {extras = ["srv"], version = "*"}
 emoji = "*"
 
 [dev-packages]
-jupyter = "*"
 isort = {extras = ["pipfile"],version = "*"}
 black = "*"
 autoflake = "*"
 flake8 = "*"
+jupyter = "*"
 ipykernel = "*"
-google-cloud-bigquery = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"
 
 [pipenv]
 allow_prereleases = true

@@ -1,4 +1,3 @@
-import json
 import logging
 import multiprocessing as mp
 import re
@@ -17,12 +16,6 @@ from nltk.stem.snowball import SnowballStemmer
 import the_hat_game.nltk_setup  # noqa: F401
 from the_hat_game.loggers import c_handler, dump_locally, logger
 from the_hat_game.players import RemotePlayer
-
-
-def send_data(data, filename):
-    with open(filename, "w") as f:
-        f.write(json.dumps(data))
-        f.write("\n")
 
 
 class Game:

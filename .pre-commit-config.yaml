@@ -11,7 +11,7 @@ repos:
         entry: pipenv run isort
         language: python
         files: \.py$
-        args: ["-w", "120", "-m", "3"]
+        args: ["-w", "120", "-m", "3", "--profile", "black"]
     -   id: black
         name: black
         entry: pipenv run black .

@@ -4,8 +4,7 @@ import os
 from pathlib import Path
 
 CWD = Path(os.getcwd())
-GAME_SCOPE = "TEST"  # Could be "GLOBAL" or "LOCAL"
-LOCAL_VOCAB_PATH = CWD / "text_samples" / "nouns_top_50.txt"
+VOCAB_PATH = CWD / "text_samples" / "nouns_top_50.txt"
 N_EXPLAIN_WORDS = 5
 N_GUESSING_WORDS = 5
 N_ROUNDS = 1

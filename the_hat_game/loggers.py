@@ -40,7 +40,11 @@ def serialize(data_to_serialize):
         return [serialize(i) for i in data]
     if isinstance(data, dict):
         return {key: serialize(value) for key, value in data.items()}
-    raise NotImplementedError
+    if data is None:
+        return data
+    raise NotImplementedError(
+        f"Serialisation is not implemented for {data_to_serialize} of type {type(data_to_serialize)}"
+    )
 
 
 def dump_locally(data, name):

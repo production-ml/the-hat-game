@@ -23,6 +23,7 @@ flask = "*"
 jupyter = "*"
 prompt-toolkit = "*"
 pymongo = {extras = ["srv"], version = "*"}
+emoji = "*"
 
 [dev-packages]
 jupyter = "*"

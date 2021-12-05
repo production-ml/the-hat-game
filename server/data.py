@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import re
@@ -8,16 +9,16 @@ from collections import Counter
 from glob import glob
 from typing import List
 
+import nltk
 from google.cloud import storage
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from tqdm.auto import tqdm
 
-from settings_server import BUCKET_DAILY, BUCKET_SPLIT_TEXTS, DATA_PATH
-from settings_server import GLOBAL_VOCAB_PATH as VOCAB_PATH
-from settings_server import STORAGE_CLIENT
+from settings_server import BUCKET_DAILY, BUCKET_SPLIT_TEXTS, DATA_PATH, STORAGE_CLIENT, VOCAB_PATH
 
+nltk.download("stopwords", quiet=True)
 STOP_WORDS = stopwords.words("english")
 LEMMATIZER = WordNetLemmatizer()
 
@@ -119,6 +120,35 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name, storage_cl
     bucket = storage_client.get_bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename(source_file_name)
+
+
+def generate_download_signed_url(bucket_name, blob_name):
+    """Generates a v4 signed URL for downloading a blob.
+
+    Note that this method requires a service account key file. You can not use
+    this if you are using Application Default Credentials from Google Compute
+    Engine or from the Google Cloud SDK.
+    """
+    # bucket_name = 'your-bucket-name'
+    # blob_name = 'your-object-name'
+
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(blob_name)
+
+    url = blob.generate_signed_url(
+        version="v4",
+        # This URL is valid for
+        expiration=datetime.timedelta(days=7),
+        # Allow GET requests using this URL.
+        method="GET",
+    )
+
+    # print("Generated GET signed URL:")
+    # print(url)
+    # print("You can use this URL with any user agent, for example:")
+    # print("curl '{}'".format(url))
+    return url
 
 
 def download_blob(bucket_name, source_blob_name, destination_file_name, storage_client=STORAGE_CLIENT):

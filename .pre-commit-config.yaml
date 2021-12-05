@@ -11,7 +11,7 @@ repos:
         entry: pipenv run isort
         language: python
         files: \.py$
-        args: ["-w", "120", "-m", "3"]
+        args: ["-w", "120", "-m", "3", "--profile", "black"]
     -   id: black
         name: black
         entry: pipenv run black .
@@ -32,11 +32,3 @@ repos:
         language: python
         pass_filenames: false
         args: ['--ignore=E501']
-    -   id: mypy
-        name: mypy
-        entry: pipenv run mypy
-        language: python
-        'types': [python]
-        args: ["--ignore-missing-imports", "--scripts-are-modules"]
-        require_serial: true
-        additional_dependencies: []

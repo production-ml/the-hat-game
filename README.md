@@ -6,12 +6,11 @@
 
 Наиболее простой способ присоединиться к игре. Мы рекомендуем начать с этого шага, чтобы на своем примере понять, как устроена игра.
 
-1. Кликните на кнопку "Deploy to heroku", чтобы задеплоить вашего первого игрока.
+1. Кликните на кнопку "Deploy to heroku", чтобы задеплоить вашего первого игрока. [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/production-ml/the-hat-game/tree/heroku)
+
 2. [Зарегистрируйтесь](https://forms.gle/9yxRsMXGRspQTaTi6) для участия в Шляпе, и ждите вашего первого раунда! [На лидерборде](https://hat-leaderboard.herokuapp.com) вы можете посмотреть на ваши очки и логи игры с вашим ботом.
 
 [Здесь](HOW_TO_START.md) вы найдете более подробное объяснение того, как устроен код игры, как написать своего первого игрока и как продолжить работать над ним.
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/production-ml/the-hat-game/tree/heroku)
 
 <!-- Этот репозиторий содержит материалы для продолжения игры, её правила, стартовую ML модель, которую [вы можете обучить](https://github.com/production-ml/the-hat-game/blob/master/GameRun_Demo.ipynb), а также другие следующие шаги, которые вы можете предпринять. Если ваша новая модель будет иметь другой URL, вы можете вернуться к гугл-форме, которую уже заполняли, и изменить там URL сервиса на новое значение. -->
 

@@ -6,7 +6,8 @@
 
 Наиболее простой способ присоединиться к игре. Мы рекомендуем начать с этого шага, чтобы на своем примере понять, как устроена игра.
 
-1. Кликните на кнопку "Deploy to heroku", чтобы задеплоить вашего первого игрока. [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/production-ml/the-hat-game/tree/heroku)
+1. Кликните на кнопку "Deploy to heroku", чтобы задеплоить вашего первого игрока.
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/production-ml/the-hat-game/tree/heroku)
 
 2. [Зарегистрируйтесь](https://forms.gle/9yxRsMXGRspQTaTi6) для участия в Шляпе, и ждите вашего первого раунда! [На лидерборде](https://hat-leaderboard.herokuapp.com) вы можете посмотреть на ваши очки и логи игры с вашим ботом.
 

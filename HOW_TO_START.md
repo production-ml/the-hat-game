@@ -111,4 +111,4 @@ docker-flask-app
 - Полноценный гайд для тех, кто хочет научиться пользоваться Docker https://docker-curriculum.com
 - Как запустить приложение в docker-контейнере на heroku (короткий пост с инструкциями) https://medium.com/travis-on-docker/how-to-run-dockerized-apps-on-heroku-and-its-pretty-great-76e07e610e22
 - Как запустить приложение в docker-контейнере на heroku (official docs) https://devcenter.heroku.com/articles/container-registry-and-runtime
-- Установить последний fasttext можно здесь (pip install не ставит последнюю версию) https://github.com/facebookresearch/fastText
+- Установить последний fasttext можно здесь (pip install не всегда может поставить последнюю версию) https://github.com/facebookresearch/fastText
